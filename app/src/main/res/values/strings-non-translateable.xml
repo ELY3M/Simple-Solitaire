@@ -86,6 +86,7 @@
     <string name="pref_key_developer_option_no_saving" translatable="false">pref_key_developer_option_no_saving</string>
     <string name="pref_key_show_advanced_settings" translatable="false">pref_key_show_expert_settings</string>
     <string name="pref_key_developer_option_deal_correct_sequences" translatable="false">pref_key_developer_option_deal_correct_sequences </string>
+    <string name="pref_key_developer_option_auto_win" translatable="false">pref_key_developer_option_auto_win </string>
     <string name="pref_key_use_true_randomisation" translatable="false">pref_key_use_true_randomisation</string>
     <string name="pref_key_max_number_undos" translatable="false">pref_key_max_number_undos</string>
 

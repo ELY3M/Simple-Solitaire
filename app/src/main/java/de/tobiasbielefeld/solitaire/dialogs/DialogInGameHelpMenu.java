@@ -25,7 +25,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.widget.Toast;
 
 import de.tobiasbielefeld.solitaire.R;
 import de.tobiasbielefeld.solitaire.ui.GameManager;
@@ -33,6 +32,7 @@ import de.tobiasbielefeld.solitaire.ui.manual.Manual;
 
 import static de.tobiasbielefeld.solitaire.SharedData.GAME;
 import static de.tobiasbielefeld.solitaire.SharedData.autoMove;
+import static de.tobiasbielefeld.solitaire.SharedData.autoWin;
 import static de.tobiasbielefeld.solitaire.SharedData.currentGame;
 import static de.tobiasbielefeld.solitaire.SharedData.gameLogic;
 import static de.tobiasbielefeld.solitaire.SharedData.hint;
@@ -64,7 +64,12 @@ public class DialogInGameHelpMenu extends DialogFragment {
                                 break;
                             case 1:
                                 if (!gameLogic.hasWon()) {
-                                    autoMove.start();
+
+                                    if (prefs.getDeveloperOptionAutoWin()){
+                                        autoWin.start();
+                                    } else {
+                                        autoMove.start();
+                                    }
                                 }
                                 break;
                             case 2:

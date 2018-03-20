@@ -134,6 +134,7 @@ public class Preferences {
     public static String PREF_KEY_DEVELOPER_OPTION_INSTANT_WIN;
     public static String PREF_KEY_USE_TRUE_RANDOMISATION;
     public static String PREF_KEY_DEVELOPER_OPTION_NO_SAVING;
+    public static String PREF_KEY_DEVELOPER_OPTION_AUTO_WIN;
     public static String PREF_KEY_DEVELOPER_OPTION_DEAL_CORRECT_SEQUENCES;
     public static String PREF_KEY_MAX_NUMBER_UNDOS;
     public static String PREF_KEY_SHOW_DIALOG_NEW_GAME;
@@ -209,6 +210,7 @@ public class Preferences {
     public static boolean DEFAULT_DEVELOPER_OPTION_INSTANT_WIN;
     public static boolean DEFAULT_DEVELOPER_OPTION_NO_SAVING;
     public static boolean DEFAULT_USE_TRUE_RANDOMISATION;
+    public static boolean DEFAULT_DEVELOPER_OPTION_AUTO_WIN;
 
     public Preferences(Context context){
         loadStrings(context.getResources());
@@ -354,6 +356,7 @@ public class Preferences {
         PREF_KEY_DEVELOPER_OPTION_PLAY_EVERY_CARD = res.getString(R.string.pref_key_developer_option_play_every_card);
         PREF_KEY_DEVELOPER_OPTION_INSTANT_WIN = res.getString(R.string.pref_key_developer_option_instant_win);
         PREF_KEY_DEVELOPER_OPTION_NO_SAVING = res.getString(R.string.pref_key_developer_option_no_saving);
+        PREF_KEY_DEVELOPER_OPTION_AUTO_WIN = res.getString(R.string.pref_key_developer_option_auto_win);
         PREF_KEY_DEVELOPER_OPTION_DEAL_CORRECT_SEQUENCES = res.getString(R.string.pref_key_developer_option_deal_correct_sequences);
 
         DEFAULT_PYRAMID_DIFFICULTY = res.getStringArray(R.array.pref_pyramid_difficulty_values)[0];
@@ -392,6 +395,7 @@ public class Preferences {
         DEFAULT_WON_AND_RELOADED = res.getBoolean(R.bool.default_won_and_reloaded);
         DEFAULT_MOVED_FIRST_CARD = res.getBoolean(R.bool.default_moved_first_card);
         DEFAULT_4_COLOR_MODE = res.getBoolean(R.bool.default_4_color_mode);
+        DEFAULT_DEVELOPER_OPTION_AUTO_WIN = res.getBoolean(R.bool.default_developer_option_auto_win);
         DEFAULT_DEVELOPER_OPTION_MOVE_CARDS_EVERYWHERE = res.getBoolean(R.bool.default_developer_option_move_cards_everywhere);
         DEFAULT_DEVELOPER_OPTION_PLAY_EVERY_CARD = res.getBoolean(R.bool.default_developer_option_play_every_card);
         DEFAULT_DEVELOPER_OPTION_INSTANT_WIN = res.getBoolean(R.bool.default_developer_option_instant_win);
@@ -1150,6 +1154,10 @@ public class Preferences {
 
     public boolean getDisableHintCosts(){
         return savedSharedData.getBoolean(PREF_KEY_DISABLE_HINT_COSTS, DEFAULT_DISABLE_HINT_COSTS);
+    }
+
+    public boolean getDeveloperOptionAutoWin(){
+        return savedSharedData.getBoolean(PREF_KEY_DEVELOPER_OPTION_AUTO_WIN,DEFAULT_DEVELOPER_OPTION_AUTO_WIN);
     }
 
     public ArrayList<String> getSavedCalculationNextCardsList(){

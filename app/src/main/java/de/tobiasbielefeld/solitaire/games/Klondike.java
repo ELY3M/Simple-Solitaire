@@ -119,10 +119,10 @@ public class Klondike extends Game {
     }
 
     public void dealCards() {
-        //dealWinnableGame();
+        dealWinnableGame();
       
         //save the new settings, so it only takes effect on new deals
-        prefs.saveKlondikeVegasDrawModeOld(whichGame);
+        /*prefs.saveKlondikeVegasDrawModeOld(whichGame);
 
         //deal cards to trash according to the draw option
         if (prefs.getSavedKlondikeVegasDrawModeOld(whichGame).equals("1")) {
@@ -575,5 +575,80 @@ public class Klondike extends Game {
             //and add it IN FRONT of the last entry
             recordList.addToLastEntry(cardsReversed, originReversed);
         }
+    }
+
+    @Override
+    public void dealWinnableGame() {
+        //flipAllCardsUp();
+
+        for (int i = 0; i < (cards.length/13); i++) {
+            for (int j = 0; j < 13; j++) {
+                int cardIndex = 13 * i + j;
+                moveToStack(cards[cardIndex], stacks[7+i], OPTION_NO_RECORD);
+            }
+        }
+
+
+        while (!stacks[7].isEmpty() || !stacks[8].isEmpty() || !stacks[9].isEmpty() || !stacks[10].isEmpty()){
+            int foundationStack = getRandomNumber(4)+7;
+            int tableauStack = getRandomNumber(7);
+
+            if (!stacks[foundationStack].isEmpty()) {
+                moveToStack(stacks[foundationStack].getTopCard(), stacks[tableauStack], OPTION_NO_RECORD);
+            }
+        }
+
+        for (int i=0;i<1000;i++){
+
+
+                int tableauStack = getRandomNumber(7);
+                int cardID;
+
+                if (!stacks[tableauStack].isEmpty()){
+
+                    for (int j=0;j<10;j++) {
+                        cardID = getRandomNumber(stacks[tableauStack].getSize());
+
+                        if (testCardsUpToTop(cards[cardID].getStack(),cards[cardID].getIndexOnStack(),ALTERNATING_COLOR)){
+                            for (int k=0;k<10;k++){
+                                int destinationID = getRandomNumber(7);
+
+                                if (tableauStack!=destinationID && cardTest(stacks[destinationID],cards[cardID])){
+                                    moveToStack(cards[cardID],stacks[destinationID], OPTION_NO_RECORD);
+                                    break;
+                                }
+                            }
+
+                            break;
+                        }
+                    }
+                }
+
+
+
+        }
+
+        for (int i=0;i<4;i++){
+            while (!stacks[7+i].isEmpty()){
+                moveToStack(stacks[7+i].getTopCard(),getDealStack(),OPTION_NO_RECORD);
+            }
+        }
+
+        for (int i=0;i<7;i++){
+            while (stacks[i].getSize()>(i+1)){
+                moveToStack(stacks[i].getTopCard(),getDealStack(),OPTION_NO_RECORD);
+            }
+        }
+
+        for (int i=0;i<7;i++){
+            while (stacks[i].getSize()<(i+1)){
+                moveToStack(getDealStack().getTopCard(),stacks[i],OPTION_NO_RECORD);
+            }
+        }
+
+        for (int i=0;i<7;i++){
+            stacks[i].getTopCard().flipUp();
+        }
+
     }
 }

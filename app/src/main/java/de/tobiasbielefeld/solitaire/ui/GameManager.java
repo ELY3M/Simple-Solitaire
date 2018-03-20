@@ -49,6 +49,7 @@ import de.tobiasbielefeld.solitaire.handler.HandlerLoadGame;
 import de.tobiasbielefeld.solitaire.helper.Animate;
 import de.tobiasbielefeld.solitaire.helper.AutoComplete;
 import de.tobiasbielefeld.solitaire.helper.AutoMove;
+import de.tobiasbielefeld.solitaire.helper.AutoWin;
 import de.tobiasbielefeld.solitaire.helper.GameLogic;
 import de.tobiasbielefeld.solitaire.helper.Hint;
 import de.tobiasbielefeld.solitaire.helper.RecordList;

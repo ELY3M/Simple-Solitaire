@@ -31,6 +31,7 @@ import java.util.Random;
 import de.tobiasbielefeld.solitaire.handler.HandlerDealCards;
 import de.tobiasbielefeld.solitaire.handler.HandlerRecordListUndo;
 import de.tobiasbielefeld.solitaire.helper.AutoMove;
+import de.tobiasbielefeld.solitaire.helper.AutoWin;
 import de.tobiasbielefeld.solitaire.helper.BackgroundMusic;
 import de.tobiasbielefeld.solitaire.classes.Card;
 import de.tobiasbielefeld.solitaire.classes.Stack;
@@ -77,6 +78,7 @@ public class SharedData {
     public static Sounds sounds;
     public static RecordList recordList;
     public static AutoMove autoMove;
+    public static AutoWin autoWin = new AutoWin();
     public static Hint hint;
     public static MovingCards movingCards = new MovingCards();
     public static LoadGame lg = new LoadGame();
@@ -94,6 +96,7 @@ public class SharedData {
     public static int activityCounter = 0;
 
     private static Toast toast;
+    private static Random rand = new Random();
 
     /**
      * Reload the needed data. Because if the android device runs out of memory, the app gets
@@ -299,6 +302,19 @@ public class SharedData {
 
         return min;
     }
+
+    public static int getRandomNumber(int mod){
+        return rand.nextInt(mod);
+    }
+
+    public static long getRandomNumber(long mod){
+        return rand.nextLong() % mod;
+    }
+
+    public static boolean getRandomBoolean(){
+        return rand.nextBoolean();
+    }
+
 
     public static Random getPrng(){
         return new Random();

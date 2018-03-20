@@ -28,6 +28,12 @@
         android:title="@string/settings_developer_options_no_saving_title"
         android:summary="@string/settings_developer_options_no_saving_text"/>
 
+    <CheckBoxPreference
+        android:defaultValue="@bool/default_developer_option_auto_win"
+        android:key="@string/pref_key_developer_option_auto_win"
+        android:title="@string/settings_developer_option_auto_win_title"
+        android:summary="@string/settings_developer_option_auto_win_text"/>
+
     <de.tobiasbielefeld.solitaire.classes.ListPreferenceWithSummary
         android:defaultValue="0"
         android:entries="@array/pref_developer_option_deal_correct_sequences_titles"

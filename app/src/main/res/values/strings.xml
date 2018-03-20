@@ -399,6 +399,8 @@
     <string name="settings_developer_option_deal_correct_sequences_3">Same family</string>
     <string name="settings_developer_option_deal_correct_sequences_4">Reversed alternating color</string>
     <string name="settings_developer_option_deal_correct_sequences_5">Reversed same family</string>
+    <string name="settings_developer_option_auto_win_title">Improve Auto move</string>
+    <string name="settings_developer_option_auto_win_text">The \"Auto move\" option will try to win the game. </string>
 
     <!-- Statistics -->
 

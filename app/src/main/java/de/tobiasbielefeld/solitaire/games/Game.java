@@ -34,6 +34,7 @@ import de.tobiasbielefeld.solitaire.R;
 import de.tobiasbielefeld.solitaire.classes.Card;
 import de.tobiasbielefeld.solitaire.classes.CardAndStack;
 import de.tobiasbielefeld.solitaire.classes.Stack;
+import de.tobiasbielefeld.solitaire.helper.FindWinningTrace;
 import de.tobiasbielefeld.solitaire.helper.Sounds;
 import de.tobiasbielefeld.solitaire.ui.GameManager;
 
@@ -1182,5 +1183,58 @@ public abstract class Game {
 
     protected void setMixingCardsTestMode(testMode mode){
         mixCardsTestMode = mode;
+    }
+
+    public boolean winTest(FindWinningTrace.State state){
+        return false;
+    }
+
+    public boolean addCardToMovementGameTest(FindWinningTrace.State state, FindWinningTrace.State.ReducedCard card) {
+        return false;
+    }
+
+    public boolean cardTest(FindWinningTrace.State.ReducedStack stack, FindWinningTrace.State.ReducedCard card) {
+        return false;
+    }
+
+    protected boolean canCardBePlaced(FindWinningTrace.State.ReducedStack stack, FindWinningTrace.State.ReducedCard card, testMode mode, testMode3 direction, boolean wrap) {
+
+        if (stack.isEmpty()) {
+            return true;
+        }
+
+        if (direction == testMode3.DESCENDING) {   //example move a 8 on top of a 9
+            switch (mode) {
+                case SAME_COLOR:
+                    return stack.getTopCard().getColor() % 2 == card.getColor() % 2 && (stack.getTopCard().getValue() == card.getValue() + 1
+                            || (wrap && stack.getTopCard().getValue() == 1 && card.getValue() == 13));
+                case ALTERNATING_COLOR:
+                    return stack.getTopCard().getColor() % 2 != card.getColor() % 2 && (stack.getTopCard().getValue() == card.getValue() + 1
+                            || (wrap && stack.getTopCard().getValue() == 1 && card.getValue() == 13));
+                case SAME_FAMILY:
+                    return stack.getTopCard().getColor() == card.getColor() && (stack.getTopCard().getValue() == card.getValue() + 1
+                            || (wrap && stack.getTopCard().getValue() == 1 && card.getValue() == 13));
+                case DOESNT_MATTER:
+                    return stack.getTopCard().getValue() == card.getValue() + 1
+                            || (wrap && stack.getTopCard().getValue() == 1 && card.getValue() == 13);
+            }
+        } else {                                //example move a 9 on top of a 8
+            switch (mode) {
+                case SAME_COLOR:
+                    return stack.getTopCard().getColor() % 2 == card.getColor() % 2 && (stack.getTopCard().getValue() == card.getValue() - 1
+                            || (wrap && stack.getTopCard().getValue() == 13 && card.getValue() == 1));
+                case ALTERNATING_COLOR:
+                    return stack.getTopCard().getColor() % 2 != card.getColor() % 2 && (stack.getTopCard().getValue() == card.getValue() - 1
+                            || (wrap && stack.getTopCard().getValue() == 13 && card.getValue() == 1));
+                case SAME_FAMILY:
+                    return stack.getTopCard().getColor() == card.getColor() && (stack.getTopCard().getValue() == card.getValue() - 1
+                            || (wrap && stack.getTopCard().getValue() == 13 && card.getValue() == 1));
+                case DOESNT_MATTER:
+                    return stack.getTopCard().getValue() == card.getValue() - 1
+                            || (wrap && stack.getTopCard().getValue() == 1 && card.getValue() == 13);
+            }
+        }
+
+        return false; //can't be reached
     }
 }

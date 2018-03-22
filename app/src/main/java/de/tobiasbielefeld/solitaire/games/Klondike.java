@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import de.tobiasbielefeld.solitaire.classes.Card;
 import de.tobiasbielefeld.solitaire.classes.CardAndStack;
 import de.tobiasbielefeld.solitaire.classes.Stack;
+import de.tobiasbielefeld.solitaire.helper.FindWinningTrace;
 
 import static de.tobiasbielefeld.solitaire.SharedData.*;
 import static de.tobiasbielefeld.solitaire.games.Game.testMode.*;
@@ -119,10 +120,10 @@ public class Klondike extends Game {
     }
 
     public void dealCards() {
-        dealWinnableGame();
+        //dealWinnableGame();
       
         //save the new settings, so it only takes effect on new deals
-        /*prefs.saveKlondikeVegasDrawModeOld(whichGame);
+        prefs.saveKlondikeVegasDrawModeOld(whichGame);
 
         //deal cards to trash according to the draw option
         if (prefs.getSavedKlondikeVegasDrawModeOld(whichGame).equals("1")) {
@@ -651,4 +652,73 @@ public class Klondike extends Game {
         }
 
     }
+
+    public boolean winTest(FindWinningTrace.State state) {
+        FindWinningTrace.State.ReducedStack[] stacks = state.stacks;
+        //if the foundation stacks aren't full, not won. Else won
+        for (int i = 7; i <= 10; i++) {
+            if (stacks[i].getSize() != 13) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean addCardToMovementGameTest(FindWinningTrace.State state, FindWinningTrace.State.ReducedCard card) {
+        return !(((card.getStackId() == 11 || card.getStackId() == 12) && !stacks[13].isEmpty())
+                || (card.getStackId() == 11 && !stacks[12].isEmpty()));
+    }
+
+    public boolean cardTest(FindWinningTrace.State.ReducedStack stack, FindWinningTrace.State.ReducedCard card) {
+        //move cards according to the klondike rules
+        if (stack.getId() < 7) {
+            if (stack.isEmpty()) {
+                return card.getValue() == 13;
+            } else {
+                return canCardBePlaced(stack, card, ALTERNATING_COLOR, DESCENDING, false);
+            }
+        } else if (stack.getId() < 11 && movingCards.hasSingleCard()) {
+            if (stack.isEmpty()) {
+                return card.getValue() == 1;
+            } else {
+                return canCardBePlaced(stack, card, SAME_FAMILY, ASCENDING, false);
+            }
+        } else {
+            return false;
+        }
+    }
+
+    /*public int onMainStackTouch(FindWinningTrace.State state) {
+
+
+        //if there are cards on the main stack
+        if (getMainStack().getSize() > 0) {
+
+
+            moveToStack(getMainStack().getTopCard(), stacks[13]);
+
+
+            return 1;
+        }
+        //if there are NO cards on the main stack, but cards on the discard stacks, move them all to main
+        else if (stacks[13].getSize() != 0) {
+            ArrayList<Card> cards = new ArrayList<>();
+
+            for (int i = 0; i < stacks[13].getSize(); i++) {
+                cards.add(stacks[13].getCard(i));
+            }
+
+            ArrayList<Card> cardsReversed = new ArrayList<>();
+            for (int i = 0; i < cards.size(); i++) {
+                cardsReversed.add(cards.get(cards.size() - 1 - i));
+            }
+
+            moveToStack(cardsReversed, getMainStack());
+
+            return 2;
+        }
+
+        return 0;
+    }*/
 }

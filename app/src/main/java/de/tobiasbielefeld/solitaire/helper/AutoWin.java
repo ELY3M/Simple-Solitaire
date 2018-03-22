@@ -42,17 +42,21 @@ public class AutoWin {
     public HandlerAutoWin handlerWin = new HandlerAutoWin();
     private boolean isRunning = false;                                                                  //shows if the autocomplete is still running
 
-    private Card[] cards = SharedData.cards;
-    private Stack[] stacks = SharedData.stacks;
-
     private final static int DELTA_TIME = 100;
     private final static int DELTA_TIME_SHORT = 20;
 
     private boolean testAfterMove = false;
     private boolean emptyMainStack = false;
 
+    FindWinningTrace.State state;
+
     public void reset() {
         isRunning = false;
+        state = null;
+    }
+
+    public void setTrace(FindWinningTrace.State state){
+        this.state = state;
     }
 
     public void start() {
@@ -76,7 +80,20 @@ public class AutoWin {
 
         } else if (isRunning) {
 
-            CardAndStack cardAndStack = currentGame.hintTest();
+            CardAndStack cardAndStack;
+
+            if (state!=null){
+                if (state.trace.size()>0) {
+                    cardAndStack = new CardAndStack(state.trace.get(0).cardId, state.trace.get(0).stackId);
+                    state.trace.remove(0);
+                } else{
+                    cardAndStack = null;
+                }
+
+            } else {
+
+                cardAndStack = currentGame.hintTest();
+            }
 
             if (cardAndStack == null && currentGame.hasMainStack()){
                 if (currentGame.getMainStack().isEmpty()){
@@ -107,7 +124,6 @@ public class AutoWin {
                 movingCards.moveToDestination(cardAndStack.getStack());
 
                 testAfterMove = true;
-
 
                 handlerWin.sendEmptyMessageDelayed(0, DELTA_TIME);
             } else {

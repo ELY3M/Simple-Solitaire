@@ -370,13 +370,13 @@ public class Stack {
 
         final boolean leftHandedMode = prefs.getSavedLeftHandedMode();
 
-        if(arrowDirection == ArrowDirection.LEFT && leftHandedMode == true) {
+        if(arrowDirection == ArrowDirection.LEFT && leftHandedMode) {
             view.setImageBitmap(Stack.arrowRight);
-        } else if(arrowDirection == ArrowDirection.LEFT && leftHandedMode == false) {
+        } else if(arrowDirection == ArrowDirection.LEFT && !leftHandedMode) {
             view.setImageBitmap(Stack.arrowLeft);
-        } else if(arrowDirection == ArrowDirection.RIGHT && leftHandedMode == true) {
+        } else if(arrowDirection == ArrowDirection.RIGHT && leftHandedMode) {
             view.setImageBitmap(Stack.arrowLeft);
-        } else if(arrowDirection == ArrowDirection.RIGHT && leftHandedMode == false) {
+        } else if(arrowDirection == ArrowDirection.RIGHT && !leftHandedMode) {
             view.setImageBitmap(Stack.arrowRight);
         }
     }

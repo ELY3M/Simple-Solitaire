@@ -576,6 +576,7 @@ public class GameManager extends CustomAppCompatActivity implements View.OnTouch
                 startActivity(new Intent(getApplicationContext(), StatisticsActivity.class));
                 break;
             case R.id.mainButtonUndo:           //undo last movement
+                //findWinningTrace.initiate(stacks,cards);
                 if (!gameLogic.hasWon()) {
                     recordList.undo(this);
                 }

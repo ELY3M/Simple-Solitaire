@@ -95,9 +95,9 @@ public class Stack {
             updateSpacing();
         }
 
-        if (currentGame.testForMainStack(this)) {
+        if (currentGame.mainStacksContain(this)) {
             card.flipDown();
-        } else if (currentGame.testForDiscardStack(this)){
+        } else if (currentGame.discardStacksContain(this)){
             card.flipUp();
         }
     }

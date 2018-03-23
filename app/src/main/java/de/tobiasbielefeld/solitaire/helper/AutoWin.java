@@ -21,6 +21,8 @@ package de.tobiasbielefeld.solitaire.helper;
 import android.os.Handler;
 import android.os.Message;
 
+import java.util.ArrayList;
+
 import de.tobiasbielefeld.solitaire.R;
 import de.tobiasbielefeld.solitaire.SharedData;
 import de.tobiasbielefeld.solitaire.classes.Card;
@@ -32,10 +34,13 @@ import de.tobiasbielefeld.solitaire.ui.GameManager;
 import static de.tobiasbielefeld.solitaire.SharedData.animate;
 import static de.tobiasbielefeld.solitaire.SharedData.autoComplete;
 import static de.tobiasbielefeld.solitaire.SharedData.autoWin;
+import static de.tobiasbielefeld.solitaire.SharedData.cards;
 import static de.tobiasbielefeld.solitaire.SharedData.currentGame;
 import static de.tobiasbielefeld.solitaire.SharedData.gameLogic;
+import static de.tobiasbielefeld.solitaire.SharedData.moveToStack;
 import static de.tobiasbielefeld.solitaire.SharedData.movingCards;
 import static de.tobiasbielefeld.solitaire.SharedData.showToast;
+import static de.tobiasbielefeld.solitaire.SharedData.stacks;
 
 public class AutoWin {
 
@@ -48,15 +53,8 @@ public class AutoWin {
     private boolean testAfterMove = false;
     private boolean emptyMainStack = false;
 
-    FindWinningTrace.State state;
-
     public void reset() {
         isRunning = false;
-        state = null;
-    }
-
-    public void setTrace(FindWinningTrace.State state){
-        this.state = state;
     }
 
     public void start() {
@@ -82,18 +80,7 @@ public class AutoWin {
 
             CardAndStack cardAndStack;
 
-            if (state!=null){
-                if (state.trace.size()>0) {
-                    cardAndStack = new CardAndStack(state.trace.get(0).cardId, state.trace.get(0).stackId);
-                    state.trace.remove(0);
-                } else{
-                    cardAndStack = null;
-                }
-
-            } else {
-
-                cardAndStack = currentGame.hintTest();
-            }
+            cardAndStack = currentGame.hintTest();
 
             if (cardAndStack == null && currentGame.hasMainStack()){
                 if (currentGame.getMainStack().isEmpty()){
@@ -131,6 +118,7 @@ public class AutoWin {
             }
         }
     }
+
 
     public static class HandlerAutoWin extends Handler {
 

@@ -53,14 +53,17 @@ public abstract class Game {
     public int[] directionBorders;
     private int dealFromID = -1;
 
-    private int[] tableauStackIDs = new int[]{-1};
-    private int[] foundationStackIDs = new int[]{-1};
     private int[] discardStackIDs = new int[]{-1};
     private int[] mainStackIDs = new int[]{-1};
 
     private boolean hasLimitedRecycles = false;
     private boolean hasFoundationStacks = false;
+    private boolean hasMainStacks = false;
+    private boolean hasDiscardStacks = false;
+    private int firstMainStackID = -1;
+    private int firstDiscardStackID = -1;
     private int lastTableauID = -1;
+    private int lastFoundationID = -1;
     private int recycleCounter = 0;
     private int totalRecycles = 0;
     private boolean hasArrow = false;
@@ -128,6 +131,7 @@ public abstract class Game {
         //delete the record list, otherwise undoing movements would result in strange behavior
         recordList.reset();
         handlerTestAfterMove.sendEmptyMessageDelayed(0,200);
+        gameLogic.resetAfterMixing();
     }
 
     public void dealNewGame(){
@@ -715,8 +719,10 @@ public abstract class Game {
      * @param IDs The stack ids to apply.
      */
     protected void setMainStackIDs(int... IDs) {
+        hasMainStacks = true;
         mainStackIDs = IDs;
         dealFromID = IDs[0];
+        firstMainStackID = dealFromID;
     }
 
     /**
@@ -725,8 +731,8 @@ public abstract class Game {
      * @param IDs The stack ids to apply.
      */
     protected void setFoundationStackIDs(int... IDs) {
-        foundationStackIDs = IDs;
         hasFoundationStacks = true;
+        lastFoundationID = IDs[IDs.length-1];
     }
 
     /**
@@ -735,7 +741,6 @@ public abstract class Game {
      * @param IDs The stack ids to apply.
      */
     protected void setTableauStackIDs(int... IDs) {
-        tableauStackIDs = IDs;
         lastTableauID = IDs[IDs.length-1];
     }
 
@@ -746,6 +751,8 @@ public abstract class Game {
      */
     protected void setDiscardStackIDs(int... IDs){
         discardStackIDs = IDs;
+        firstDiscardStackID = IDs[0];
+        hasDiscardStacks = true;
     }
 
     /**
@@ -904,35 +911,32 @@ public abstract class Game {
             return true;
         }
 
+        int topCardColor = stack.getTopCard().getColor();
+        int topCardValue = stack.getTopCard().getValue();
+        int cardColor = card.getColor();
+        int cardValue = card.getValue();
+
         if (direction == testMode3.DESCENDING) {   //example move a 8 on top of a 9
             switch (mode) {
                 case SAME_COLOR:
-                    return stack.getTopCard().getColor() % 2 == card.getColor() % 2 && (stack.getTopCard().getValue() == card.getValue() + 1
-                            || (wrap && stack.getTopCard().getValue() == 1 && card.getValue() == 13));
+                    return topCardColor % 2 == cardColor % 2 && (topCardValue == cardValue + 1 || (wrap && topCardValue == 1 && cardValue == 13));
                 case ALTERNATING_COLOR:
-                    return stack.getTopCard().getColor() % 2 != card.getColor() % 2 && (stack.getTopCard().getValue() == card.getValue() + 1
-                            || (wrap && stack.getTopCard().getValue() == 1 && card.getValue() == 13));
+                    return topCardColor % 2 != cardColor % 2 && (topCardValue == cardValue + 1 || (wrap && topCardValue == 1 && cardValue == 13));
                 case SAME_FAMILY:
-                    return stack.getTopCard().getColor() == card.getColor() && (stack.getTopCard().getValue() == card.getValue() + 1
-                            || (wrap && stack.getTopCard().getValue() == 1 && card.getValue() == 13));
+                    return topCardColor == cardColor && (topCardValue == cardValue + 1 || (wrap && topCardValue == 1 && cardValue == 13));
                 case DOESNT_MATTER:
-                    return stack.getTopCard().getValue() == card.getValue() + 1
-                            || (wrap && stack.getTopCard().getValue() == 1 && card.getValue() == 13);
+                    return topCardValue == cardValue + 1 || (wrap && topCardValue == 1 && cardValue == 13);
             }
         } else {                                //example move a 9 on top of a 8
             switch (mode) {
                 case SAME_COLOR:
-                    return stack.getTopCard().getColor() % 2 == card.getColor() % 2 && (stack.getTopCard().getValue() == card.getValue() - 1
-                            || (wrap && stack.getTopCard().getValue() == 13 && card.getValue() == 1));
+                    return topCardColor % 2 == cardColor % 2 && (topCardValue == cardValue - 1 || (wrap && topCardValue == 13 && cardValue == 1));
                 case ALTERNATING_COLOR:
-                    return stack.getTopCard().getColor() % 2 != card.getColor() % 2 && (stack.getTopCard().getValue() == card.getValue() - 1
-                            || (wrap && stack.getTopCard().getValue() == 13 && card.getValue() == 1));
+                    return topCardColor % 2 != cardColor % 2 && (topCardValue == cardValue - 1 || (wrap && topCardValue == 13 && cardValue == 1));
                 case SAME_FAMILY:
-                    return stack.getTopCard().getColor() == card.getColor() && (stack.getTopCard().getValue() == card.getValue() - 1
-                            || (wrap && stack.getTopCard().getValue() == 13 && card.getValue() == 1));
+                    return topCardColor == cardColor && (topCardValue == cardValue - 1 || (wrap && topCardValue == 13 && cardValue == 1));
                 case DOESNT_MATTER:
-                    return stack.getTopCard().getValue() == card.getValue() - 1
-                            || (wrap && stack.getTopCard().getValue() == 1 && card.getValue() == 13);
+                    return topCardValue == cardValue - 1 || (wrap && topCardValue == 1 && cardValue == 13);
             }
         }
 
@@ -1014,7 +1018,7 @@ public abstract class Game {
 
         for (int id : mainStackIDs){
             if (id == -1){
-                throw new ArrayIndexOutOfBoundsException("No discard stack specified");
+                throw new ArrayIndexOutOfBoundsException("No main stack specified");
             }
 
             mainStacks.add(stacks[id]);
@@ -1028,7 +1032,7 @@ public abstract class Game {
     }
 
     public boolean hasMainStack() {
-        return mainStackIDs[0]!=-1;
+        return hasMainStacks;
     }
 
     public Stack getDealStack() {
@@ -1036,7 +1040,7 @@ public abstract class Game {
     }
 
     public boolean hasDiscardStack() {
-        return discardStackIDs[0]!=-1;
+        return hasDiscardStacks;
     }
 
     public boolean hasLimitedRecycles() {
@@ -1121,12 +1125,20 @@ public abstract class Game {
         ASCENDING, DESCENDING
     }
 
-    public boolean testForDiscardStack(Stack stack){
+    public boolean discardStacksContain(Stack stack){
         return hasDiscardStack() && getDiscardStacks().contains(stack);
     }
 
-    public boolean testForMainStack(Stack stack){
+    public boolean mainStacksContain(Stack stack){
         return hasMainStack() && getMainStacks().contains(stack);
+    }
+
+    public boolean mainStacksContain(int id){
+        return hasMainStack() && id >= firstMainStackID;
+    }
+
+    public boolean discardStacksContain(int id){
+        return hasDiscardStack() && id >= firstDiscardStackID && id < firstMainStackID;
     }
 
     public boolean hidesRecycleCounter(){
@@ -1134,47 +1146,15 @@ public abstract class Game {
     }
 
     public boolean tableauStacksContain(int ID){
-
-        for (int stackID : tableauStackIDs){
-            if (stackID == ID){
-                return true;
-            }
-        }
-
-        return false;
+        return ID <= getLastTableauId();
     }
 
     public boolean foundationStacksContain(int ID){
-
-        for (int stackID : foundationStackIDs){
-            if (stackID == ID){
-                return true;
-            }
-        }
-
-        return false;
+        return hasFoundationStacks && ID > getLastTableauId() && ID <= getLastFoundationID();
     }
 
-    public boolean discardStacksContain(int ID){
-
-        for (int stackID : discardStackIDs){
-            if (stackID == ID){
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public boolean mainStacksContain(int ID){
-
-        for (int stackID : mainStackIDs){
-            if (stackID == ID){
-                return true;
-            }
-        }
-
-        return false;
+    public int getLastFoundationID(){
+        return lastFoundationID;
     }
 
     public boolean addCardToMovementTest(Card card){
@@ -1203,38 +1183,43 @@ public abstract class Game {
             return true;
         }
 
+        int topCardColor = stack.getTopCard().getColor();
+        int topCardValue = stack.getTopCard().getValue();
+        int cardColor = card.getColor();
+        int cardValue = card.getValue();
+
         if (direction == testMode3.DESCENDING) {   //example move a 8 on top of a 9
             switch (mode) {
                 case SAME_COLOR:
-                    return stack.getTopCard().getColor() % 2 == card.getColor() % 2 && (stack.getTopCard().getValue() == card.getValue() + 1
-                            || (wrap && stack.getTopCard().getValue() == 1 && card.getValue() == 13));
+                    return topCardColor % 2 == cardColor % 2 && (topCardValue == cardValue + 1 || (wrap && topCardValue == 1 && cardValue == 13));
                 case ALTERNATING_COLOR:
-                    return stack.getTopCard().getColor() % 2 != card.getColor() % 2 && (stack.getTopCard().getValue() == card.getValue() + 1
-                            || (wrap && stack.getTopCard().getValue() == 1 && card.getValue() == 13));
+                    return topCardColor % 2 != cardColor % 2 && (topCardValue == cardValue + 1 || (wrap && topCardValue == 1 && cardValue == 13));
                 case SAME_FAMILY:
-                    return stack.getTopCard().getColor() == card.getColor() && (stack.getTopCard().getValue() == card.getValue() + 1
-                            || (wrap && stack.getTopCard().getValue() == 1 && card.getValue() == 13));
+                    return topCardColor == cardColor && (topCardValue == cardValue + 1 || (wrap && topCardValue == 1 && cardValue == 13));
                 case DOESNT_MATTER:
-                    return stack.getTopCard().getValue() == card.getValue() + 1
-                            || (wrap && stack.getTopCard().getValue() == 1 && card.getValue() == 13);
+                    return topCardValue == cardValue + 1 || (wrap && topCardValue == 1 && cardValue == 13);
             }
         } else {                                //example move a 9 on top of a 8
             switch (mode) {
                 case SAME_COLOR:
-                    return stack.getTopCard().getColor() % 2 == card.getColor() % 2 && (stack.getTopCard().getValue() == card.getValue() - 1
-                            || (wrap && stack.getTopCard().getValue() == 13 && card.getValue() == 1));
+                    return topCardColor % 2 == cardColor % 2 && (topCardValue == cardValue - 1 || (wrap && topCardValue == 13 && cardValue == 1));
                 case ALTERNATING_COLOR:
-                    return stack.getTopCard().getColor() % 2 != card.getColor() % 2 && (stack.getTopCard().getValue() == card.getValue() - 1
-                            || (wrap && stack.getTopCard().getValue() == 13 && card.getValue() == 1));
+                    return topCardColor % 2 != cardColor % 2 && (topCardValue == cardValue - 1 || (wrap && topCardValue == 13 && cardValue == 1));
                 case SAME_FAMILY:
-                    return stack.getTopCard().getColor() == card.getColor() && (stack.getTopCard().getValue() == card.getValue() - 1
-                            || (wrap && stack.getTopCard().getValue() == 13 && card.getValue() == 1));
+                    return topCardColor == cardColor && (topCardValue == cardValue - 1 || (wrap && topCardValue == 13 && cardValue == 1));
                 case DOESNT_MATTER:
-                    return stack.getTopCard().getValue() == card.getValue() - 1
-                            || (wrap && stack.getTopCard().getValue() == 1 && card.getValue() == 13);
+                    return topCardValue == cardValue - 1 || (wrap && topCardValue == 1 && cardValue == 13);
             }
         }
 
         return false; //can't be reached
+    }
+
+    public int onMainStackTouch(FindWinningTrace.State state) {
+        return 0;
+    }
+
+    public boolean autoCompleteStartTest(FindWinningTrace.State state){
+        return false;
     }
 }

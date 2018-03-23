@@ -73,7 +73,7 @@ public class GameManager extends CustomAppCompatActivity implements View.OnTouch
     private final static long DOUBLE_TAP_SPEED = 400;                                               //time delta between two taps in milliseconds
     public boolean hasLoaded = false;                                                               //used to call save() in onPause() only if load() has been called before
     public Button buttonAutoComplete;                                                               //button for auto complete
-    public TextView mainTextViewTime, mainTextViewScore, mainTextViewRecycles;                       //textViews for time, scores and re-deals
+    public TextView mainTextViewTime, mainTextViewScore, mainTextViewRecycles, mainTextViewWin;     //textViews for time, scores and re-deals
     public RelativeLayout layoutGame;                                                               //contains the game stacks and cards
     public View highlight;
     private long firstTapTime;                                                                       //stores the time of first tapping on a card
@@ -98,6 +98,7 @@ public class GameManager extends CustomAppCompatActivity implements View.OnTouch
         layoutGame = (RelativeLayout) findViewById(R.id.mainRelativeLayoutGame);
         mainTextViewTime = (TextView) findViewById(R.id.mainTextViewTime);
         mainTextViewScore = (TextView) findViewById(R.id.mainTextViewScore);
+        mainTextViewWin = (TextView) findViewById(R.id.mainTextViewWin);
         mainTextViewRecycles = (TextView) findViewById(R.id.textViewRecycles);
         buttonAutoComplete = (Button) findViewById(R.id.buttonMainAutoComplete);
         mainRelativeLayoutBackground = (RelativeLayout) findViewById(R.id.mainRelativeLayoutBackground);

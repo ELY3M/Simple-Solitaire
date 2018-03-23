@@ -1,6 +1,8 @@
 package de.tobiasbielefeld.solitaire.helper;
 
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,10 +10,12 @@ import java.util.List;
 import de.tobiasbielefeld.solitaire.classes.Card;
 import de.tobiasbielefeld.solitaire.classes.Stack;
 
-import static de.tobiasbielefeld.solitaire.SharedData.autoWin;
 import static de.tobiasbielefeld.solitaire.SharedData.currentGame;
+import static de.tobiasbielefeld.solitaire.SharedData.gameLogic;
 import static de.tobiasbielefeld.solitaire.SharedData.logText;
-
+import static de.tobiasbielefeld.solitaire.helper.FindWinningTrace.testMode2.SAME_VALUE;
+import static de.tobiasbielefeld.solitaire.helper.FindWinningTrace.testMode2.SAME_VALUE_AND_COLOR;
+import static de.tobiasbielefeld.solitaire.helper.FindWinningTrace.testMode2.SAME_VALUE_AND_FAMILY;
 
 /**
  * Created by tobias on 20.03.18.
@@ -19,15 +23,25 @@ import static de.tobiasbielefeld.solitaire.SharedData.logText;
 
 public class FindWinningTrace {
 
+    private static int TRACE_MAX_LENGTH = 20;
+    private static int MAX_TIME_MILLIS = 5000;
+
     private boolean foundWinningTrace = false;
+    private long maxTime;
+    private int runCounter = 0;
+    private boolean gotResult = false;
+    private int currentId = 0;
+    private static int CARDS_MAX_SIZE;
 
     public class State{
 
         public ReducedStack[] stacks;
         public ReducedCard[] cards;
         public List<Entry> trace;
+        public boolean mainStackAlreadyFlipped = false;
+        public int id;
 
-        public State(Card[] normalCards, Stack[] normalStacks){
+        public State(Card[] normalCards, Stack[] normalStacks, int id){
             cards = new ReducedCard[normalCards.length];
             stacks = new ReducedStack[normalStacks.length];
 
@@ -39,13 +53,27 @@ public class FindWinningTrace {
                 stacks[i] = new ReducedStack(normalStacks[i]);
             }
 
-            trace = new ArrayList<>();
+            trace = new ArrayList<>(TRACE_MAX_LENGTH);
+            this.id = id;
         }
 
         public State(State original){
-            this.cards = original.cards.clone();
-            this.stacks = original.stacks.clone();
+            cards = new ReducedCard[original.cards.length];
+            stacks = new ReducedStack[original.stacks.length];
+
+            for (int i = 0; i < original.cards.length; i++){
+                cards[i] = new ReducedCard(original.cards[i]);
+            }
+
+            for (int i = 0; i < original.stacks.length; i++){
+                stacks[i] = new ReducedStack(original.stacks[i]);
+            }
+
             this.trace = new ArrayList<>(original.trace);
+
+            this.mainStackAlreadyFlipped = original.mainStackAlreadyFlipped;
+
+            this.id = original.id;
         }
 
         public class ReducedCard{
@@ -61,6 +89,18 @@ public class FindWinningTrace {
                 stackId = card.getStackId();
                 id = card.getId();
                 isUp = card.isUp();
+            }
+
+            ReducedCard(ReducedCard card){
+                color = card.getColor();
+                value = card.getValue();
+                stackId = card.getStackId();
+                id = card.getId();
+                isUp = card.isUp();
+            }
+
+            public ReducedStack getStack(){
+                return stacks[stackId];
             }
 
             public int getStackId(){
@@ -101,16 +141,28 @@ public class FindWinningTrace {
             public int getValue(){
                 return value;
             }
+
+            public boolean isTopCard(){
+                return stacks[stackId].currentCards.indexOf(this) == stacks[stackId].getSize()-1;
+            }
         }
 
         public class ReducedStack{
-            public ArrayList<ReducedCard> currentCards = new ArrayList<>();                                    //the array of cards on the stack
-            private int id;                                                                             //id: 0 to 6 tableau. 7 to 10 foundations. 11 and 12 discard and Main stack
+            public ArrayList<ReducedCard> currentCards = new ArrayList<>();
+            private int id;
 
             ReducedStack(Stack stack){
                 id = stack.getId();
 
                 for (Card card : stack.currentCards){
+                    currentCards.add(cards[card.getId()]);
+                }
+            }
+
+            ReducedStack(ReducedStack stack){
+                id = stack.getId();
+
+                for (ReducedCard card : stack.currentCards){
                     currentCards.add(cards[card.getId()]);
                 }
             }
@@ -134,6 +186,12 @@ public class FindWinningTrace {
             public void addCard(ReducedCard card) {
                 card.setStack(id);
                 currentCards.add(card);
+
+                if (currentGame.mainStacksContain(id)) {
+                    card.isUp = false;
+                } else if (currentGame.discardStacksContain(id)){
+                    card.isUp = true;
+                }
             }
 
             public int getId(){
@@ -146,20 +204,12 @@ public class FindWinningTrace {
         }
 
         public class Entry {
-            int cardId;
-            int stackId;
+            int card;
+            int stack;
 
             Entry(int cardId, int stackId) {
-                this.cardId = cardId;
-                this.stackId = stackId;
-            }
-
-            int getCardId() {
-                return cardId;
-            }
-
-            int getStackId() {
-                return stackId;
+                card = cardId;
+                stack = stackId;
             }
         }
 
@@ -168,129 +218,254 @@ public class FindWinningTrace {
         }
 
         public void addTrace(int cardId, int stackId){
+            if (trace.size() == TRACE_MAX_LENGTH){
+                trace.remove(0);
+            }
+
             trace.add(new Entry(cardId,stackId));
         }
     }
 
-    public void initiate(Stack[] normalStacks, Card[] normalCards){
-        foundWinningTrace = false;
-        run(new State(normalCards,normalStacks));
+    public class HandlerBreak extends Handler {
+
+        private int id;
+
+        HandlerBreak(int id){
+            this.id = id;
+        }
+
+        public void handleMessage(Message msg) {
+            super.handleMessage(msg);
+
+            if (currentId == id && !foundWinningTrace && !gotResult){
+                gameLogic.setWinnableText("Calculation takes too long",false);
+                gotResult = true;
+            }
+        }
     }
 
-    public void run(State state) {
-        final State newState = state.deepCopy();
+    public void decrementRunCounter(){
+        runCounter --;
+
+        if (runCounter==0 && !gotResult){
+            gameLogic.setWinnableText("Not winnable",true);
+            gotResult = true;
+        }
+    }
+
+    public void initiate(Stack[] normalStacks, Card[] normalCards){
+
+        CARDS_MAX_SIZE = normalCards.length;
+
+        gameLogic.setWinnableText("Calculating...",false);
+
+        runCounter = 0;
+        gotResult = false;
+        foundWinningTrace = false;
+        maxTime = System.currentTimeMillis() + MAX_TIME_MILLIS;
+        currentId ++;
+        run(new State(normalCards,normalStacks, currentId));
+
+        HandlerBreak handlerBreak = new HandlerBreak(currentId);
+        handlerBreak.sendEmptyMessageDelayed(0, MAX_TIME_MILLIS);
+    }
+
+    public void run(final State state) {
+        //final State newState = state.deepCopy();
+        runCounter ++;
 
         AsyncTask.execute(new Runnable() {
             @Override
             public void run () {
-                runTest(newState);
+                runTest(state);
+
+                if (state.id == currentId) {
+                    decrementRunCounter();
+                }
             }
         });
     }
 
     private void runTest(State state){
-        /*logText("running test...");
-
-        logText(state.stacks[7].getSize() + " " + state.stacks[8].getSize()  + " " + state.stacks[9].getSize()  + " " + state.stacks[10].getSize());
-        logText("size: " + state.trace.size());*/
-
-        if (foundWinningTrace){
-            return;
-        }
-
-        //if (currentGame.winTest(state)) {
-        if (state.trace.size()>0) {
-            foundWinningTrace = true;
-            returnWinningTrace(state);
-        }
 
         boolean foundCardToMove = false;
 
-        for (int i=0;i<7;i++){
+        if (foundWinningTrace || System.currentTimeMillis() > maxTime || currentId != state.id){
+            return;
+        }
 
+        /*if (state.trace.size() == TRACE_MAX_LENGTH) {
+            State.Entry topTrace = state.trace.get(TRACE_MAX_LENGTH-1);
 
-            for (int j=0;j<state.stacks[i].getSize();j++){
+            for (int j=TRACE_MAX_LENGTH-2;j>=0;j--){
+                State.Entry bottomTrace = state.trace.get(j);
+
+                if (topTrace.card == bottomTrace.card && topTrace.stack == bottomTrace.stack){
+                    decrementRunCounter();
+                    return;
+                }
+            }
+        }*/
+
+        //logText("size: " + runCounter);
+        //logText("size: " + state.trace.size());
+        //logState(state);
+
+        if (currentGame.autoCompleteStartTest(state)) {
+            foundWinningTrace = true;
+            returnWinningTrace();
+            return;
+        }
+
+        for (int i=0;i<state.stacks.length;i++){
+
+            //do not check cards on the foundation stack
+            if (currentGame.foundationStacksContain(i)){
+                continue;
+            }
+
+            //for (int j=0;j<state.stacks[i].getSize();j++){
+            for (int j=state.stacks[i].getSize()-1;j>=0;j--){
                 State.ReducedCard cardToMove = state.stacks[i].getCard(j);
 
                 if (cardToMove.isUp && currentGame.addCardToMovementGameTest(state,cardToMove)){
 
-                    for (int k=0;k<state.stacks.length;k++){
+                    for (int k=state.stacks.length-1;k>=0;k--){
                         State.ReducedStack destination = state.stacks[k];
 
                         if (i!=k && currentGame.cardTest(destination,cardToMove)){
+
+                            //if moving to foundation, but the card isn't on top of the stack (moving multiple cards to foundation)
+                            if (currentGame.foundationStacksContain(k) && !cardToMove.isTopCard()){
+                                continue;
+                            }
+                            //moving around the tableau
+                            else if (currentGame.tableauStacksContain(i) && j == 0 && destination.isEmpty()){
+                                continue;
+                            }
+                            //avoid moving cards between stacks, eg moving a nine lying on a ten moving to another then, moving it back and so on...
+                            else if (i <= currentGame.getLastTableauId() && sameCardOnOtherStack(cardToMove,state.stacks[k],SAME_VALUE_AND_COLOR)) {
+                                continue;
+                            }
+
                             foundCardToMove = true;
-                            moveToStack(state, cardToMove.getId(), destination.getId());
+
+                            int size = state.stacks[i].getSize() - j;
+
+                            List<State.ReducedCard> cardsToMove = new ArrayList<>(size);
+
+                            for (int l = j; l < j + size; l++) {
+                                cardsToMove.add( cardToMove.getStack().getCard(l));
+                            }
+
+                            //if the moving card is on the tableau, flip the card below it up
+                            if (j>0 && currentGame.tableauStacksContain(i)) {
+                                state.stacks[i].getCard(j-1).flipUp();
+                            }
+
+                            //mark this, so flipping the main stack over will be possible again
+                            state.mainStackAlreadyFlipped = false;
+
+                            moveToStack(state, cardsToMove, destination);
                         }
                     }
-
-
-                    break;
                 }
-            }
-
-        }
-
-        /*if (!foundCardToMove) {
-
-            for (int i = 11; i < 15; i++) {
-
-
-                for (int j = 0; j < state.stacks[i].getSize(); j++) {
-                    State.ReducedCard cardToMove = state.stacks[i].getCard(j);
-
-                    //if (currentGame.addCardToMovementGameTest(state, cardToMove)) {
-
-                        for (int k = 0; k < state.stacks.length; k++) {
-                            State.ReducedStack destination = state.stacks[k];
-
-                            if (i != k && currentGame.cardTest(destination, cardToMove)) {
-                                moveToStack(state, cardToMove.getId(), destination.getId());
-                            }
-                        }
-
-
-                    //}
-                }
-
-            }
-        }*/
-
-    }
-
-    public void returnWinningTrace(State state){
-        logText("Winning trace found");
-        autoWin.setTrace(state);
-        autoWin.start();
-    }
-
-    public void moveToStack(State state, int cardId, int stackId) {
-        state.addTrace(cardId,stackId);
-
-        State.ReducedStack origin = state.stacks[state.cards[cardId].getStackId()];
-
-        if (origin.getId() >10 ) {
-            State.ReducedCard card = state.cards[cardId];
-            card.removeFromCurrentStack();
-            state.stacks[stackId].addCard(card);
-        } else {
-            for (int i = state.cards[cardId].getIndexOnStack(); i < origin.getSize(); i++) {
-                State.ReducedCard card = origin.getCard(i);
-                card.removeFromCurrentStack();
-                state.stacks[stackId].addCard(card);
-            }
-
-            if (origin.getSize() > 0 && origin.getId() <= currentGame.getLastTableauId() && !origin.getTopCard().isUp()) {
-                origin.getTopCard().flipUp();
             }
         }
 
-        //handlerTestAfterMove.sendEmptyMessageDelayed(0, 100);
+        if (!foundCardToMove) {
+            if (currentGame.hasMainStack()){
+                currentGame.onMainStackTouch(state);
+            }
+        }
+    }
 
-        /*if (origin.getSize() > 0 && origin.getId() <= currentGame.getLastTableauId() && !origin.getTopCard().isUp()) {
-            origin.getTopCard().flipUp();
-        }*/
+    public void returnWinningTrace(){
+        gameLogic.setWinnableText("Game is winnable",true);
+        gotResult = true;
+        //logText("Winning trace found");
+        //autoWin.setTrace(state);
+        //autoWin.start();
+    }
 
-        run(state);
+    public void moveToStack(State state, State.ReducedCard card, State.ReducedStack destination) {
+        List<State.ReducedCard> cards = new ArrayList<>(CARDS_MAX_SIZE);
+        cards.add(card);
+
+        moveToStack(state, cards, destination);
+    }
+
+    public void moveToStack(State state, List<State.ReducedCard> cards,  State.ReducedStack destination) {
+
+        final State newState = state.deepCopy();
+
+        List<State.ReducedCard> newCards = new ArrayList<>(CARDS_MAX_SIZE);
+        State.ReducedStack newDestination = newState.stacks[destination.getId()];
+
+        for (int i=0;i<cards.size();i++){
+            newCards.add(newState.cards[cards.get(i).getId()]);
+        }
+
+        newState.addTrace(newCards.get(0).getId(),newDestination.getId());
+
+        for (int i = 0; i < newCards.size(); i++) {
+            if (newCards.get(i).getStack() != newDestination) {
+                newCards.get(i).removeFromCurrentStack();
+                newDestination.addCard(newCards.get(i));
+            }
+        }
+
+        run(newState);
+    }
+
+    public void logState(State state){
+        logText("############################################");
+        logText("############### Loggin state ###############");
+        logText("############################################");
+
+        for (int i=0;i<state.stacks.length;i++) {
+            StringBuilder data = new StringBuilder();
+
+            for (int j = 0; j < state.stacks[i].getSize(); j++) {
+                data.append(Integer.toString(state.stacks[i].currentCards.get(j).getValue())).append(" ");
+            }
+
+            logText("Stack " + i + ": " + data);
+        }
+
+
+        if (state.trace.size()>0) {
+            logText("");
+            logText("Last trace: " + state.cards[state.trace.get(state.trace.size() - 1).card].value + "->" + state.trace.get(state.trace.size() - 1).stack);
+        }
+    }
+
+    protected boolean sameCardOnOtherStack(State.ReducedCard card, State.ReducedStack otherStack, testMode2 mode) {
+        State.ReducedStack origin = card.getStack();
+
+        if (card.getIndexOnStack() > 0 && origin.getCard(card.getIndexOnStack() - 1).isUp() && otherStack.getSize() > 0) {
+            State.ReducedCard cardBelow = origin.getCard(card.getIndexOnStack() - 1);
+
+            if (mode == SAME_VALUE_AND_COLOR) {
+                if (cardBelow.getValue() == otherStack.getTopCard().getValue() && cardBelow.getColor() % 2 == otherStack.getTopCard().getColor() % 2) {
+                    return true;
+                }
+            } else if (mode == SAME_VALUE_AND_FAMILY) {
+                if (cardBelow.getValue() == otherStack.getTopCard().getValue() && cardBelow.getColor() == otherStack.getTopCard().getColor()) {
+                    return true;
+                }
+            } else if (mode == SAME_VALUE) {
+                if (cardBelow.getValue() == otherStack.getTopCard().getValue()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    protected enum testMode2 {
+        SAME_VALUE_AND_COLOR, SAME_VALUE_AND_FAMILY, SAME_VALUE
     }
 
 }

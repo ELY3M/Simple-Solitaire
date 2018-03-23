@@ -1,207 +1,217 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:a="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/mainRelativeLayoutBackground"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    a:id="@+id/mainRelativeLayoutBackground"
+    a:layout_width="match_parent"
+    a:layout_height="match_parent"
     tools:context=".ui.GameManager">
 
     <RelativeLayout
-        android:id="@+id/mainRelativeLayoutGame"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_toLeftOf="@+id/linearLayout">
+        a:id="@+id/mainRelativeLayoutGame"
+        a:layout_width="match_parent"
+        a:layout_height="match_parent"
+        a:layout_toLeftOf="@+id/linearLayout">
 
         <View
-            android:id="@+id/card_highlight"
-            android:layout_width="10dp"
-            android:layout_height="10dp"
-            android:background="@drawable/card_highlight"
-            android:visibility="gone" />
+            a:id="@+id/card_highlight"
+            a:layout_width="10dp"
+            a:layout_height="10dp"
+            a:background="@drawable/card_highlight"
+            a:visibility="gone" />
     </RelativeLayout>
 
     <RelativeLayout
-        android:id="@+id/mainRelativeLayoutGameOverlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_toLeftOf="@+id/linearLayout">
+        a:id="@+id/mainRelativeLayoutGameOverlay"
+        a:layout_width="match_parent"
+        a:layout_height="match_parent"
+        a:layout_toLeftOf="@+id/linearLayout">
 
         <View
-            android:layout_width="4dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:background="@drawable/shadow_left_to_right" />
+            a:layout_width="4dp"
+            a:layout_height="match_parent"
+            a:layout_alignParentLeft="true"
+            a:layout_alignParentTop="true"
+            a:background="@drawable/shadow_left_to_right" />
 
         <FrameLayout
-            android:id="@+id/frameLayout2"
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentLeft="true"
-            android:background="#000000" />
+            a:id="@+id/frameLayout2"
+            a:layout_width="1dp"
+            a:layout_height="match_parent"
+            a:layout_alignParentLeft="true"
+            a:background="#000000" />
 
         <View
-            android:layout_width="4dp"
-            android:layout_height="match_parent"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:background="@drawable/shadow_right_to_left" />
+            a:layout_width="4dp"
+            a:layout_height="match_parent"
+            a:layout_alignParentRight="true"
+            a:layout_alignParentTop="true"
+            a:background="@drawable/shadow_right_to_left" />
 
         <TextView
-            android:id="@+id/mainTextViewScore"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_margin="5dp"
-            android:maxLines="1"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            a:id="@+id/mainTextViewWin"
+            a:layout_width="wrap_content"
+            a:layout_height="wrap_content"
+            a:layout_above="@+id/mainTextViewScore"
+            a:layout_alignLeft="@+id/mainTextViewScore"
+            a:layout_alignStart="@+id/mainTextViewScore"
+            a:maxLines="1"
+            a:textAppearance="?android:attr/textAppearanceMedium" />
 
         <TextView
-            android:id="@+id/mainTextViewTime"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_margin="5dp"
-            android:layout_toLeftOf="@+id/frameLayout"
-            android:layout_toStartOf="@+id/frameLayout"
-            android:maxLines="1"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+            a:id="@+id/mainTextViewScore"
+            a:layout_width="wrap_content"
+            a:layout_height="wrap_content"
+            a:layout_alignParentBottom="true"
+            a:layout_alignParentLeft="true"
+            a:layout_alignParentStart="true"
+            a:layout_margin="5dp"
+            a:maxLines="1"
+            a:textAppearance="?android:attr/textAppearanceMedium" />
+
+        <TextView
+            a:id="@+id/mainTextViewTime"
+            a:layout_width="wrap_content"
+            a:layout_height="wrap_content"
+            a:layout_alignParentBottom="true"
+            a:layout_margin="5dp"
+            a:layout_toLeftOf="@+id/frameLayout"
+            a:layout_toStartOf="@+id/frameLayout"
+            a:maxLines="1"
+            a:textAppearance="?android:attr/textAppearanceMedium" />
 
         <FrameLayout
-            android:id="@+id/frameLayout"
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
+            a:id="@+id/frameLayout"
+            a:layout_width="1dp"
+            a:layout_height="match_parent"
 
-            android:layout_alignParentRight="true"
-            android:background="#000000" />
+            a:layout_alignParentRight="true"
+            a:background="#000000" />
 
         <Button
-            android:id="@+id/buttonMainAutoComplete"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_above="@+id/mainTextViewTime"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="10dp"
-            android:background="@android:drawable/btn_default_small"
-            android:onClick="menuClick"
-            android:text="@string/game_auto_complete_text"
-            android:visibility="gone" />
+            a:id="@+id/buttonMainAutoComplete"
+            a:layout_width="wrap_content"
+            a:layout_height="wrap_content"
+            a:layout_above="@+id/mainTextViewTime"
+            a:layout_centerHorizontal="true"
+            a:layout_marginBottom="10dp"
+            a:background="@android:drawable/btn_default_small"
+            a:onClick="menuClick"
+            a:text="@string/game_auto_complete_text"
+            a:visibility="gone" />
 
         <TextView
-            android:id="@+id/textViewRecycles"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/circle"
-            android:paddingLeft="4dp"
-            android:paddingRight="4dp"
-            android:visibility="gone" />
+            a:id="@+id/textViewRecycles"
+            a:layout_width="wrap_content"
+            a:layout_height="wrap_content"
+            a:background="@drawable/circle"
+            a:paddingLeft="4dp"
+            a:paddingRight="4dp"
+            a:visibility="gone" />
 
     </RelativeLayout>
 
     <LinearLayout
-        android:id="@+id/linearLayout"
-        android:layout_width="?attr/actionBarSize"
-        android:layout_height="match_parent"
-        android:background="#e7e7e7"
-        android:baselineAligned="false"
-        android:gravity="center"
-        android:orientation="vertical"
-        android:visibility="visible"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true">
+        a:id="@+id/linearLayout"
+        a:layout_width="?attr/actionBarSize"
+        a:layout_height="match_parent"
+        a:background="#e7e7e7"
+        a:baselineAligned="false"
+        a:gravity="center"
+        a:orientation="vertical"
+        a:visibility="visible"
+        a:layout_alignParentTop="true"
+        a:layout_alignParentRight="true"
+        a:layout_alignParentEnd="true">
 
         <FrameLayout
-            android:id="@+id/mainButtonScores"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:onClick="menuClick">
+            a:id="@+id/mainButtonScores"
+            a:layout_width="match_parent"
+            a:layout_height="0dp"
+            a:layout_weight="1"
+            a:onClick="menuClick">
 
             <ImageView
-                android:id="@+id/button_scores"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?attr/selectableItemBackground"
-                android:contentDescription="@string/title_activity_statistics"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
+                a:id="@+id/button_scores"
+                a:layout_width="match_parent"
+                a:layout_height="match_parent"
+                a:background="?attr/selectableItemBackground"
+                a:contentDescription="@string/title_activity_statistics"
+                a:paddingLeft="5dp"
+                a:paddingRight="5dp"
                 app:srcCompat="@drawable/icon_star" />
         </FrameLayout>
 
         <FrameLayout
-            android:id="@+id/mainButtonHint"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:onClick="menuClick">
+            a:id="@+id/mainButtonHint"
+            a:layout_width="match_parent"
+            a:layout_height="0dp"
+            a:layout_weight="1"
+            a:onClick="menuClick">
 
             <ImageView
-                android:id="@+id/button_hint"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?attr/selectableItemBackground"
-                android:contentDescription="@string/title_activity_statistics"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
+                a:id="@+id/button_hint"
+                a:layout_width="match_parent"
+                a:layout_height="match_parent"
+                a:background="?attr/selectableItemBackground"
+                a:contentDescription="@string/title_activity_statistics"
+                a:paddingLeft="5dp"
+                a:paddingRight="5dp"
                 app:srcCompat="@drawable/icon_lightbulb_on" />
         </FrameLayout>
 
         <FrameLayout
-            android:id="@+id/mainButtonRestart"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:onClick="menuClick">
+            a:id="@+id/mainButtonRestart"
+            a:layout_width="match_parent"
+            a:layout_height="0dp"
+            a:layout_weight="1"
+            a:onClick="menuClick">
 
             <ImageView
-                android:id="@+id/button_restart"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?attr/selectableItemBackground"
-                android:contentDescription="@string/menu_main_menu"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
+                a:id="@+id/button_restart"
+                a:layout_width="match_parent"
+                a:layout_height="match_parent"
+                a:background="?attr/selectableItemBackground"
+                a:contentDescription="@string/menu_main_menu"
+                a:paddingLeft="5dp"
+                a:paddingRight="5dp"
                 app:srcCompat="@drawable/icon_menu" />
         </FrameLayout>
 
         <FrameLayout
-            android:id="@+id/mainButtonUndo"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:onClick="menuClick">
+            a:id="@+id/mainButtonUndo"
+            a:layout_width="match_parent"
+            a:layout_height="0dp"
+            a:layout_weight="1"
+            a:onClick="menuClick">
 
             <ImageView
-                android:id="@+id/button_undo"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?attr/selectableItemBackground"
-                android:contentDescription="@string/menu_undo"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
+                a:id="@+id/button_undo"
+                a:layout_width="match_parent"
+                a:layout_height="match_parent"
+                a:background="?attr/selectableItemBackground"
+                a:contentDescription="@string/menu_undo"
+                a:paddingLeft="5dp"
+                a:paddingRight="5dp"
                 app:srcCompat="@drawable/icon_undo" />
         </FrameLayout>
 
         <FrameLayout
-            android:id="@+id/mainButtonSettings"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:onClick="menuClick">
+            a:id="@+id/mainButtonSettings"
+            a:layout_width="match_parent"
+            a:layout_height="0dp"
+            a:layout_weight="1"
+            a:onClick="menuClick">
 
             <ImageView
-                android:id="@+id/button_settings"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?attr/selectableItemBackground"
-                android:contentDescription="@string/menu_settings"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
+                a:id="@+id/button_settings"
+                a:layout_width="match_parent"
+                a:layout_height="match_parent"
+                a:background="?attr/selectableItemBackground"
+                a:contentDescription="@string/menu_settings"
+                a:paddingLeft="5dp"
+                a:paddingRight="5dp"
                 app:srcCompat="@drawable/icon_settings_black" />
         </FrameLayout>
 

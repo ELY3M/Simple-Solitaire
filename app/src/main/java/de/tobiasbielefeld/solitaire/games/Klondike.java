@@ -666,11 +666,21 @@ public class Klondike extends Game {
     }
 
     public boolean addCardToMovementGameTest(FindWinningTrace.State state, FindWinningTrace.State.ReducedCard card) {
-        return !(((card.getStackId() == 11 || card.getStackId() == 12) && !stacks[13].isEmpty())
-                || (card.getStackId() == 11 && !stacks[12].isEmpty()));
+        if ( (card.getStackId() == 13 || card.getStackId() == 12 || card.getStackId() == 11)
+                && card.getIndexOnStack()!=card.getStack().getSize()-1){
+            return false;
+        }
+
+
+        return !(((card.getStackId() == 11 || card.getStackId() == 12) && !state.stacks[13].isEmpty())
+                || (card.getStackId() == 11 && !state.stacks[12].isEmpty()));
     }
 
     public boolean cardTest(FindWinningTrace.State.ReducedStack stack, FindWinningTrace.State.ReducedCard card) {
+
+        //if (card.getStackId() == 13) {
+        //    logText("discard stack card, value: " +  card.getValue() + ", moving to " + stack.getId());
+        //}
         //move cards according to the klondike rules
         if (stack.getId() < 7) {
             if (stack.isEmpty()) {
@@ -689,36 +699,51 @@ public class Klondike extends Game {
         }
     }
 
-    /*public int onMainStackTouch(FindWinningTrace.State state) {
+    public int onMainStackTouch(FindWinningTrace.State state) {
 
 
         //if there are cards on the main stack
-        if (getMainStack().getSize() > 0) {
+        if (state.stacks[getMainStack().getId()].getSize() > 0) {
 
-
-            moveToStack(getMainStack().getTopCard(), stacks[13]);
+            findWinningTrace.moveToStack(state, state.stacks[getMainStack().getId()].getTopCard(), state.stacks[13]);
 
 
             return 1;
         }
         //if there are NO cards on the main stack, but cards on the discard stacks, move them all to main
-        else if (stacks[13].getSize() != 0) {
-            ArrayList<Card> cards = new ArrayList<>();
+        else if (state.stacks[13].getSize() != 0 && !state.mainStackAlreadyFlipped) {
+            state.mainStackAlreadyFlipped = true;
 
-            for (int i = 0; i < stacks[13].getSize(); i++) {
-                cards.add(stacks[13].getCard(i));
+            ArrayList<FindWinningTrace.State.ReducedCard> cards = new ArrayList<>();
+
+            for (int i = 0; i < state.stacks[13].getSize(); i++) {
+                cards.add(state.stacks[13].getCard(i));
             }
 
-            ArrayList<Card> cardsReversed = new ArrayList<>();
+            ArrayList<FindWinningTrace.State.ReducedCard> cardsReversed = new ArrayList<>();
             for (int i = 0; i < cards.size(); i++) {
                 cardsReversed.add(cards.get(cards.size() - 1 - i));
             }
 
-            moveToStack(cardsReversed, getMainStack());
+            findWinningTrace.moveToStack(state, cardsReversed, state.stacks[getMainStack().getId()]);
 
             return 2;
         }
 
         return 0;
-    }*/
+    }
+
+    public boolean autoCompleteStartTest(FindWinningTrace.State state) {
+
+        //if every card is faced up, show the auto complete button
+        for (int i = 0; i < 7; i++) {
+            if (state.stacks[i].getSize() > 0 && !state.stacks[i].getCard(0).isUp()) {
+                return false;
+            }
+        }
+
+
+
+        return true;
+    }
 }

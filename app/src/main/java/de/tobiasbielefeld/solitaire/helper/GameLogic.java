@@ -40,6 +40,7 @@ public class GameLogic {
     private boolean won, wonAndReloaded;                                                            //shows if the player has won, needed to know if the timer can stop, or to deal new cards on game start
     private GameManager gm;
     private boolean movedFirstCard = false;
+    private boolean winningTestHasResult = false;
 
     public GameLogic(GameManager gm) {
         this.gm = gm;
@@ -142,6 +143,8 @@ public class GameLogic {
                 //deal the cards again in case the app got killed while trying  before
                 if (prefs.isDealingCards()){
                     handlerDealCards.sendEmptyMessage(0);
+                } else {
+                    gameLogic.startWinTest();
                 }
             }
         } catch (Exception e) {
@@ -212,11 +215,20 @@ public class GameLogic {
         won = false;
         wonAndReloaded = false;
 
+        winningTestHasResult = false;
+
+        setWinnableText("",false);
+
         //save that the game is dealing cards, in case the application gets killed before calling the handler
         prefs.setDealingCards(true);
 
         //and finally deal the cards from the game!
         handlerDealCards.sendEmptyMessage(0);
+    }
+
+    public void resetAfterMixing(){
+        winningTestHasResult = false;
+        startWinTest();
     }
 
     /**
@@ -371,7 +383,23 @@ public class GameLogic {
         return (autoComplete.isRunning() || animate.cardIsAnimating() || hint.isWorking() || recordList.isWorking() || autoMove.isRunning());
     }
 
-    public boolean getMovedFirstCard(){
-        return movedFirstCard;
+    public void startWinTest(){
+        if (!winningTestHasResult) {
+            findWinningTrace.initiate(stacks,cards);
+        }
     }
+
+    public void setWinnableText(final String text, boolean hasResult){
+        winningTestHasResult = hasResult;
+
+        gm.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                gm.mainTextViewWin.setText(text);
+            }
+        });
+
+    }
+
+
 }

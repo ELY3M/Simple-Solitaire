@@ -289,7 +289,7 @@ public class Klondike extends Game {
             } else {
                 return canCardBePlaced(stack, card, ALTERNATING_COLOR, DESCENDING);
             }
-        } else if (stack.getId() < 11 && movingCards.hasSingleCard()) {
+        } else if (stack.getId() < 11 && card.isTopCard()) {
             if (stack.isEmpty()) {
                 return card.getValue() == 1;
             } else {
@@ -300,7 +300,7 @@ public class Klondike extends Game {
         }
     }
 
-    public boolean addCardToMovementGameTest(Card card, Stack[] stacks) {
+    public boolean addCardToMovementGameTest(Card card) {
         //don't move cards from the discard stacks if there is a card on top of them
         //for example: if touched a card on stack 11 (first discard stack) but there is a card
         //on stack 12 (second discard stack) don't move if.
@@ -679,7 +679,7 @@ public class Klondike extends Game {
             } else {
                 return canCardBePlaced(stack, card, ALTERNATING_COLOR, DESCENDING, false);
             }
-        } else if (stack.getId() < 11 && movingCards.hasSingleCard()) {
+        } else if (stack.getId() < 11 && card.isTopCard()) {
             if (stack.isEmpty()) {
                 return card.getValue() == 1;
             } else {
@@ -702,8 +702,7 @@ public class Klondike extends Game {
             return 1;
         }
         //if there are NO cards on the main stack, but cards on the discard stacks, move them all to main
-        else if (state.stacks[13].getSize() != 0 && !state.mainStackAlreadyFlipped) {
-            state.mainStackAlreadyFlipped = true;
+        else if (state.stacks[13].getSize() != 0) {
 
             ArrayList<FindWinningTrace.State.ReducedCard> cards = new ArrayList<>();
 
@@ -736,5 +735,13 @@ public class Klondike extends Game {
 
 
         return true;
+    }
+
+    public boolean addCardToMovementGameTest(FindWinningTrace.State.ReducedCard card, FindWinningTrace.State.ReducedStack[] stacks) {
+        //don't move cards from the discard stacks if there is a card on top of them
+        //for example: if touched a card on stack 11 (first discard stack) but there is a card
+        //on stack 12 (second discard stack) don't move if.
+        return !(((card.getStackId() == 11 || card.getStackId() == 12) && !stacks[13].isEmpty())
+                || (card.getStackId() == 11 && !stacks[12].isEmpty()));
     }
 }

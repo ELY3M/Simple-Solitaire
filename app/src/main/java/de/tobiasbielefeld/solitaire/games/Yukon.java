@@ -113,7 +113,7 @@ public class Yukon extends Game {
             } else {
                 return checkRules(stack, card) && (stack.getTopCard().getValue() == card.getValue() + 1);
             }
-        } else if (movingCards.hasSingleCard()) {                                                     //foundation
+        } else if (card.isTopCard()) {                                                     //foundation
             if (stack.isEmpty()) {
                 return card.getValue() == 1;
             } else {

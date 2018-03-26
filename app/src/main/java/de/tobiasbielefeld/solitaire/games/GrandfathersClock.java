@@ -256,7 +256,7 @@ public class GrandfathersClock extends Game {
 
             return movingCards <= getPowerMoveCount(stack.isEmpty()) && canCardBePlaced(stack, card, DOESNT_MATTER, DESCENDING);
         } else {
-            return movingCards.hasSingleCard() && canCardBePlaced(stack, card, SAME_FAMILY, ASCENDING, true);
+            return card.isTopCard() && canCardBePlaced(stack, card, SAME_FAMILY, ASCENDING, true);
         }
     }
 

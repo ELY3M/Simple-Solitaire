@@ -305,7 +305,7 @@ public class DummyGame extends Game {
             } else {
                 return canCardBePlaced(stack, card, ALTERNATING_COLOR, DESCENDING);                 //Cards on the tableau can be placed in alternating color and descending order
             }
-        } else if (stack.getId() < 11 && movingCards.hasSingleCard()) {                             //if its an foundation stack and only one card is moving
+        } else if (stack.getId() < 11 && card.isTopCard()) {                             //if its an foundation stack and only one card is moving
             if (stack.isEmpty()) {                                                                  //place if it's an ace
                 return card.getValue() == 1;
             } else {

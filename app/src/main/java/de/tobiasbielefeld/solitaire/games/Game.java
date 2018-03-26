@@ -112,10 +112,10 @@ public abstract class Game {
                 }
                 while ( //the card below cardToChange shouldn't be too similar (but only if there is a card below)
                         (!cardToChange.isFirstCard() && (cardToChange.getCardBelow().getValue() == cardsToMix.get(i).getValue() || cardToChange.getCardBelow().getColor() == cardsToMix.get(i).getColor())
-                        //the card on top cardToChange shouldn't be too similar (but only if there is a card on top)
-                        || !cardToChange.isTopCard() &&      (cardToChange.getCardOnTop().getValue() == cardsToMix.get(i).getValue() || cardToChange.getCardOnTop().getColor() == cardsToMix.get(i).getColor()))
-                        //and the loop shouldn't take too long
-                        && counter < 10);
+                                //the card on top cardToChange shouldn't be too similar (but only if there is a card on top)
+                                || !cardToChange.isTopCard() &&      (cardToChange.getCardOnTop().getValue() == cardsToMix.get(i).getValue() || cardToChange.getCardOnTop().getColor() == cardsToMix.get(i).getColor()))
+                                //and the loop shouldn't take too long
+                                && counter < 10);
             }
 
             cardToChange.getStack().exchangeCard(cardToChange,cardsToMix.get(i));
@@ -156,9 +156,9 @@ public abstract class Game {
 
                 for (int i = 0; i < (cards.length/13); i++) {
                     for (int j = 0; j < 13; j++) {
-                            int cardIndex = (13 * (i + 1)) - j - 1;
-                            cards[cardIndex].removeFromCurrentStack();
-                            moveToStack(cards[cardIndex], stacks[i], OPTION_NO_RECORD);
+                        int cardIndex = (13 * (i + 1)) - j - 1;
+                        cards[cardIndex].removeFromCurrentStack();
+                        moveToStack(cards[cardIndex], stacks[i], OPTION_NO_RECORD);
                     }
                 }
 
@@ -285,7 +285,7 @@ public abstract class Game {
      * @param card The card to test
      * @return True if it can be added, false otherwise
      */
-    abstract public boolean addCardToMovementGameTest(Card card, Stack[] stacks);
+    abstract public boolean addCardToMovementGameTest(Card card);
 
     /**
      * Checks every card of the game, if one can be moved as a hint.
@@ -991,12 +991,11 @@ public abstract class Game {
 
     //some getters,setters and simple methods, games should'nt override these
     public Stack getDiscardStack() throws ArrayIndexOutOfBoundsException {
-
-        if (firstDiscardStackID == -1) {
+        if (discardStackIDs[0] == -1) {
             throw new ArrayIndexOutOfBoundsException("No discard stack specified");
         }
 
-        return stacks[firstDiscardStackID];
+        return stacks[discardStackIDs[0]];
     }
 
     public ArrayList<Stack> getDiscardStacks() throws ArrayIndexOutOfBoundsException {
@@ -1011,6 +1010,21 @@ public abstract class Game {
         }
 
         return discardStacks;
+    }
+
+
+    public ArrayList<Stack> getMainStacks() throws ArrayIndexOutOfBoundsException {
+        ArrayList<Stack> mainStacks = new ArrayList<>();
+
+        for (int id : mainStackIDs){
+            if (id == -1){
+                throw new ArrayIndexOutOfBoundsException("No main stack specified");
+            }
+
+            mainStacks.add(stacks[id]);
+        }
+
+        return mainStacks;
     }
 
     protected void setLastTableauID(int id) {
@@ -1143,7 +1157,18 @@ public abstract class Game {
         mixCardsTestMode = mode;
     }
 
+    public int getMainStackId(){
+        return mainStackIDs[0];
+    }
+
+
+
+
     public boolean winTest(FindWinningTrace.State state){
+        return false;
+    }
+
+    public boolean addCardToMovementGameTest(FindWinningTrace.State state, FindWinningTrace.State.ReducedCard card) {
         return false;
     }
 

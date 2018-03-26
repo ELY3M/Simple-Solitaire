@@ -499,10 +499,6 @@ public class Stack {
         }
     }
 
-    public boolean topCardIsUp() {
-        return getSize() == 0 || getTopCard().isUp();
-    }
-
     public Card getCard(int index) {                                                                //get card from index
         return currentCards.get(index);
     }

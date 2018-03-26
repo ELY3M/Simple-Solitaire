@@ -132,7 +132,7 @@ public class FortyEight extends Game {
             int movingCards = card.getStack().getSize() - card.getIndexOnStack();
 
             return movingCards <= getPowerMoveCount(stack.isEmpty()) && canCardBePlaced(stack, card, SAME_FAMILY, DESCENDING);
-        } else if (stack.getId() < 16 && movingCards.hasSingleCard()) {
+        } else if (stack.getId() < 16 && card.isTopCard()) {
             if (stack.isEmpty()) {
                 return card.getValue() == 1;
             } else {

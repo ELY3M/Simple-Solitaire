@@ -119,8 +119,8 @@ public class Freecell extends Game {
             return movingCards <= getPowerMoveCount(stack.isEmpty()) && canCardBePlaced(stack, card, ALTERNATING_COLOR, DESCENDING);
 
         } else if (stack.getId() < 12) {
-            return movingCards.hasSingleCard() && stack.isEmpty();
-        } else if (movingCards.hasSingleCard() && stack.getId() < 16) {
+            return card.isTopCard() && stack.isEmpty();
+        } else if (card.isTopCard() && stack.getId() < 16) {
             if (stack.isEmpty()) {
                 return card.getValue() == 1;
             } else {

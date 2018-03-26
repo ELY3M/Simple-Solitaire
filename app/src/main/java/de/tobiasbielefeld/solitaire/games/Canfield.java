@@ -356,7 +356,7 @@ public class Canfield extends Game {
 
         if (stack.getId() < 4) {
             return canCardBePlaced(stack, card, ALTERNATING_COLOR, DESCENDING, true);
-        } else if (stack.getId() < 9 && movingCards.hasSingleCard()) {
+        } else if (stack.getId() < 9 && card.isTopCard()) {
             if (stack.isEmpty()) {
                 return card.getValue() == startCardValue;
             } else {

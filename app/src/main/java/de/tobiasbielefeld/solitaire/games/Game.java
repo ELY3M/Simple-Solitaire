@@ -285,7 +285,7 @@ public abstract class Game {
      * @param card The card to test
      * @return True if it can be added, false otherwise
      */
-    abstract public boolean addCardToMovementGameTest(Card card);
+    abstract public boolean addCardToMovementGameTest(Card card, Stack[] stacks);
 
     /**
      * Checks every card of the game, if one can be moved as a hint.
@@ -991,11 +991,12 @@ public abstract class Game {
 
     //some getters,setters and simple methods, games should'nt override these
     public Stack getDiscardStack() throws ArrayIndexOutOfBoundsException {
-        if (discardStackIDs[0] == -1) {
+
+        if (firstDiscardStackID == -1) {
             throw new ArrayIndexOutOfBoundsException("No discard stack specified");
         }
 
-        return stacks[discardStackIDs[0]];
+        return stacks[firstDiscardStackID];
     }
 
     public ArrayList<Stack> getDiscardStacks() throws ArrayIndexOutOfBoundsException {
@@ -1010,21 +1011,6 @@ public abstract class Game {
         }
 
         return discardStacks;
-    }
-
-
-    public ArrayList<Stack> getMainStacks() throws ArrayIndexOutOfBoundsException {
-        ArrayList<Stack> mainStacks = new ArrayList<>();
-
-        for (int id : mainStackIDs){
-            if (id == -1){
-                throw new ArrayIndexOutOfBoundsException("No main stack specified");
-            }
-
-            mainStacks.add(stacks[id]);
-        }
-
-        return mainStacks;
     }
 
     protected void setLastTableauID(int id) {
@@ -1125,14 +1111,6 @@ public abstract class Game {
         ASCENDING, DESCENDING
     }
 
-    public boolean discardStacksContain(Stack stack){
-        return hasDiscardStack() && getDiscardStacks().contains(stack);
-    }
-
-    public boolean mainStacksContain(Stack stack){
-        return hasMainStack() && getMainStacks().contains(stack);
-    }
-
     public boolean mainStacksContain(int id){
         return hasMainStack() && id >= firstMainStackID;
     }
@@ -1166,10 +1144,6 @@ public abstract class Game {
     }
 
     public boolean winTest(FindWinningTrace.State state){
-        return false;
-    }
-
-    public boolean addCardToMovementGameTest(FindWinningTrace.State state, FindWinningTrace.State.ReducedCard card) {
         return false;
     }
 

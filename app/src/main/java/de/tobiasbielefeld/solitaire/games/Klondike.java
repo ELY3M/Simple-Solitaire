@@ -300,7 +300,7 @@ public class Klondike extends Game {
         }
     }
 
-    public boolean addCardToMovementGameTest(Card card) {
+    public boolean addCardToMovementGameTest(Card card, Stack[] stacks) {
         //don't move cards from the discard stacks if there is a card on top of them
         //for example: if touched a card on stack 11 (first discard stack) but there is a card
         //on stack 12 (second discard stack) don't move if.
@@ -665,16 +665,7 @@ public class Klondike extends Game {
         return true;
     }
 
-    public boolean addCardToMovementGameTest(FindWinningTrace.State state, FindWinningTrace.State.ReducedCard card) {
-        if ( (card.getStackId() == 13 || card.getStackId() == 12 || card.getStackId() == 11)
-                && card.getIndexOnStack()!=card.getStack().getSize()-1){
-            return false;
-        }
 
-
-        return !(((card.getStackId() == 11 || card.getStackId() == 12) && !state.stacks[13].isEmpty())
-                || (card.getStackId() == 11 && !state.stacks[12].isEmpty()));
-    }
 
     public boolean cardTest(FindWinningTrace.State.ReducedStack stack, FindWinningTrace.State.ReducedCard card) {
 

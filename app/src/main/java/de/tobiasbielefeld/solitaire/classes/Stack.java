@@ -40,11 +40,14 @@ public class Stack {
             background11, background12, background13, arrowLeft, arrowRight, backgroundTransparent;
     public CustomImageView view;                                                                          //Background of the stack
     public ArrayList<Card> currentCards = new ArrayList<>();                                        //the array of cards on the stack
-    private int id;                                                                                 //id: 0 to 6 tableau. 7 to 10 foundations. 11 and 12 discard and Main stack
+    protected int id;                                                                                 //id: 0 to 6 tableau. 7 to 10 foundations. 11 and 12 discard and Main stack
     private float spacing;                                                                          //direction in which the cards on the stacks are ordered (top, down, left, right)
     private SpacingDirection spacingDirection = SpacingDirection.NONE;
     private ArrowDirection arrowDirection;
     private float spacingMax;
+
+    public Stack(){
+    }
 
     public Stack(int id) {                                                                          //Constructor: set id
         this.id = id;
@@ -82,22 +85,17 @@ public class Stack {
      * Adds a card to this stack. This will update the spacings and flips the card if the stack
      * is a main- or discard stack.
      *
+     * Important: After applying this method, always call stacks[i].updateSpacing() in eg a for loop
+     *
      * @param card The card to add.
-     * @param shouldUpdate tells if the stack should update its spacing and card views. Use false
-     *                     If you take care of it at another place. Eg after the asigning loop
-     *                     another loop with stacks[i].updateSpacing()
      */
-    public void addCard(Card card, boolean shouldUpdate) {
+    public void addCard(Card card) {
         card.setStack(this);
         currentCards.add(card);
 
-        if (shouldUpdate) {
-            updateSpacing();
-        }
-
-        if (currentGame.mainStacksContain(this)) {
+        if (currentGame.mainStacksContain(getId())) {
             card.flipDown();
-        } else if (currentGame.discardStacksContain(this)){
+        } else if (currentGame.discardStacksContain(getId())){
             card.flipUp();
         }
     }
@@ -135,10 +133,10 @@ public class Stack {
      * @throws ArrayIndexOutOfBoundsException If the stack is empty
      */
     public Card getCardFromTop(int index) throws ArrayIndexOutOfBoundsException {
-        if (!isEmpty()) {
-            return currentCards.get(currentCards.size() - 1 - index);
+        if (currentCards.size() - 1 - index < 0) {
+            throw new ArrayIndexOutOfBoundsException("Wrong index on stack!");
         } else {
-            throw new ArrayIndexOutOfBoundsException("Empty Stack, check with isEmpty() before!");
+            return currentCards.get(currentCards.size() - 1 - index);
         }
     }
 
@@ -232,8 +230,7 @@ public class Stack {
         ArrayList<Integer> list = prefs.getSavedStacks(id);
 
         for (Integer i : list) {
-            addCard(cards[i],false);
-            //cards[i].view.bringToFront();
+            addCard(cards[i]);
         }
 
         updateSpacing();

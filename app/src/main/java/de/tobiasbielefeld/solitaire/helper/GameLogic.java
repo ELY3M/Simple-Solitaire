@@ -202,7 +202,7 @@ public class GameLogic {
                 card.setLocation(currentGame.getDealStack().getX(), currentGame.getDealStack().getY());
             }
 
-            currentGame.getDealStack().addCard(card,false);
+            currentGame.getDealStack().addCard(card);
             card.flipDown();
         }
 
@@ -215,9 +215,7 @@ public class GameLogic {
         won = false;
         wonAndReloaded = false;
 
-        winningTestHasResult = false;
-
-        setWinnableText("",false);
+        resetWinnableGameText();
 
         //save that the game is dealing cards, in case the application gets killed before calling the handler
         prefs.setDealingCards(true);
@@ -227,10 +225,14 @@ public class GameLogic {
     }
 
     public void resetAfterMixing(){
-        winningTestHasResult = false;
+        resetWinnableGameText();
         startWinTest();
     }
 
+    private void resetWinnableGameText(){
+        setWinnableText("");
+        winningTestHasResult = false;
+    }
     /**
      * in case the current game is won: save the score and start the win animation. The record list
      * is reseted, so the player can't revert card movements after the animation
@@ -384,13 +386,13 @@ public class GameLogic {
     }
 
     public void startWinTest(){
-        if (!winningTestHasResult) {
+        if (!winningTestHasResult && !findWinningTrace.isRunning()) {
             findWinningTrace.initiate(stacks,cards);
         }
     }
 
-    public void setWinnableText(final String text, boolean hasResult){
-        winningTestHasResult = hasResult;
+    public void setWinnableText(final String text){
+        winningTestHasResult = true;
 
         gm.runOnUiThread(new Runnable() {
             @Override
@@ -398,7 +400,6 @@ public class GameLogic {
                 gm.mainTextViewWin.setText(text);
             }
         });
-
     }
 
 

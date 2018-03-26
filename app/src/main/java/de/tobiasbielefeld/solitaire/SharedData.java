@@ -224,7 +224,7 @@ public class SharedData {
         for (int i = 0; i < cards.size(); i++) {
             if (cards.get(i).getStack() != destinations.get(i)) {
                 cards.get(i).removeFromCurrentStack();
-                destinations.get(i).addCard(cards.get(i),false);
+                destinations.get(i).addCard(cards.get(i));
             }
         }
 

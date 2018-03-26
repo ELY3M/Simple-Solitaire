@@ -358,11 +358,8 @@ public class RecordList {
         void undoMore() {
             //Check if the movement resulted in a increment of the redeal counter, if so, revert it
             if (currentGame.hasLimitedRecycles() && !alreadyDecremented)  {
-                ArrayList<Stack> discardStacks = currentGame.getDiscardStacks();
-
                 for (int i=0;i<currentCards.size();i++){
-
-                    if (currentCards.get(i).getStack() == currentGame.getDealStack() && discardStacks.contains(currentOrigins.get(i))) {
+                    if (currentCards.get(i).getStack() == currentGame.getDealStack() && currentGame.discardStacksContain(currentOrigins.get(i).getId())) {
                         currentGame.decrementRecycleCounter(gm);
                         alreadyDecremented = true;
                         break;

@@ -673,6 +673,7 @@ public class GameManager extends CustomAppCompatActivity implements View.OnTouch
 
     private boolean discardStacksContainCards(){
 
+
         for (Stack stack : currentGame.getDiscardStacks()){
             if (!stack.isEmpty()) {
                 return true;

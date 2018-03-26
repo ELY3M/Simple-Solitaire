@@ -1101,11 +1101,11 @@ public abstract class Game {
         return hintCosts;
     }
 
-    protected enum testMode {
+    public enum testMode {
         SAME_COLOR, ALTERNATING_COLOR, DOESNT_MATTER, SAME_FAMILY
     }
 
-    protected enum testMode2 {
+    public enum testMode2 {
         SAME_VALUE_AND_COLOR, SAME_VALUE_AND_FAMILY, SAME_VALUE
     }
 

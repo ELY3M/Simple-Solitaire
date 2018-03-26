@@ -687,7 +687,7 @@ public class Klondike extends Game {
         //if there are cards on the main stack
         if (state.stacks[getMainStack().getId()].getSize() > 0) {
 
-            findWinningTrace.moveToStack(state, state.stacks[getMainStack().getId()].getTopCard().getId(), 13);
+            findWinningTrace.moveToStackInSameState(state, state.stacks[getMainStack().getId()].getTopCard().getId(), 13);
 
 
             return 1;
@@ -695,18 +695,14 @@ public class Klondike extends Game {
         //if there are NO cards on the main stack, but cards on the discard stacks, move them all to main
         else if (state.stacks[13].getSize() != 0) {
 
-            ArrayList<FindWinningTrace.State.ReducedCard> cards = new ArrayList<>();
+            int[] cardIds = new int[stacks[13].getSize()];
+            int size = state.stacks[13].getSize()-1;
 
-            for (int i = 0; i < state.stacks[13].getSize(); i++) {
-                cards.add(state.stacks[13].getCard(i));
+            for (int i = 0; i <= size; i++) {
+                cardIds[size-i] = state.stacks[13].getCard(i).getId();
             }
 
-            ArrayList<Integer> cardsReversed = new ArrayList<>();
-            for (int i = 0; i < cards.size(); i++) {
-                cardsReversed.add(cards.get(cards.size() - 1 - i).getId());
-            }
-
-            findWinningTrace.moveToStack(state, cardsReversed, 14);
+            findWinningTrace.moveToStackInSameState(state,14, cardIds);
 
             return 2;
         }
@@ -729,11 +725,10 @@ public class Klondike extends Game {
     }
 
     public boolean addCardToMovementGameTest(FindWinningTrace.State.ReducedCard card, FindWinningTrace.State.ReducedStack[] stacks){
-        if ( (card.getStackId() == 13 || card.getStackId() == 12 || card.getStackId() == 11)
-                               && card.getIndexOnStack()!=card.getStack().getSize()-1){
+
+        if ( discardStacksContain(card.getStackId()) && !card.isTopCard()){
                    return false;
         }
-
 
         return !(((card.getStackId() == 11 || card.getStackId() == 12) && !stacks[13].isEmpty())
                 || (card.getStackId() == 11 && !stacks[12].isEmpty()));

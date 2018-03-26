@@ -22,6 +22,7 @@ import android.os.Handler;
 import android.os.Message;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import de.tobiasbielefeld.solitaire.R;
 import de.tobiasbielefeld.solitaire.SharedData;
@@ -52,6 +53,8 @@ public class AutoWin {
 
     private boolean testAfterMove = false;
     private boolean emptyMainStack = false;
+
+    private List<FindWinningTrace.State.Entry> trace;
 
     public void reset() {
         isRunning = false;

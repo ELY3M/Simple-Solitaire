@@ -39,7 +39,9 @@ import de.tobiasbielefeld.solitaire.helper.Sounds;
 import de.tobiasbielefeld.solitaire.ui.GameManager;
 
 import static de.tobiasbielefeld.solitaire.SharedData.*;
-import static de.tobiasbielefeld.solitaire.games.Game.testMode2.*;
+import static de.tobiasbielefeld.solitaire.games.Game.testMode2.SAME_VALUE;
+import static de.tobiasbielefeld.solitaire.games.Game.testMode2.SAME_VALUE_AND_COLOR;
+import static de.tobiasbielefeld.solitaire.games.Game.testMode2.SAME_VALUE_AND_FAMILY;
 
 /**
  * Abstract class for all the games. See the DUMMY GAME for detailed explanation of everything!
@@ -766,6 +768,7 @@ public abstract class Game {
 
     protected void disableMainStack(){
         mainStackIDs = new int[]{-1};
+        hasMainStacks = false;
     }
 
     /**
@@ -991,11 +994,11 @@ public abstract class Game {
 
     //some getters,setters and simple methods, games should'nt override these
     public Stack getDiscardStack() throws ArrayIndexOutOfBoundsException {
-        if (discardStackIDs[0] == -1) {
+        if (firstDiscardStackID == -1) {
             throw new ArrayIndexOutOfBoundsException("No discard stack specified");
         }
 
-        return stacks[discardStackIDs[0]];
+        return stacks[firstDiscardStackID];
     }
 
     public ArrayList<Stack> getDiscardStacks() throws ArrayIndexOutOfBoundsException {
@@ -1010,21 +1013,6 @@ public abstract class Game {
         }
 
         return discardStacks;
-    }
-
-
-    public ArrayList<Stack> getMainStacks() throws ArrayIndexOutOfBoundsException {
-        ArrayList<Stack> mainStacks = new ArrayList<>();
-
-        for (int id : mainStackIDs){
-            if (id == -1){
-                throw new ArrayIndexOutOfBoundsException("No main stack specified");
-            }
-
-            mainStacks.add(stacks[id]);
-        }
-
-        return mainStacks;
     }
 
     protected void setLastTableauID(int id) {
@@ -1162,19 +1150,15 @@ public abstract class Game {
     }
 
 
-
-
-    public boolean winTest(FindWinningTrace.State state){
-        return false;
-    }
-
-    public boolean addCardToMovementGameTest(FindWinningTrace.State state, FindWinningTrace.State.ReducedCard card) {
+    public boolean addCardToMovementGameTest(FindWinningTrace.State.ReducedCard card, FindWinningTrace.State.ReducedStack[] stacks){
         return false;
     }
 
     public boolean cardTest(FindWinningTrace.State.ReducedStack stack, FindWinningTrace.State.ReducedCard card) {
         return false;
     }
+
+
 
     protected boolean canCardBePlaced(FindWinningTrace.State.ReducedStack stack, FindWinningTrace.State.ReducedCard card, testMode mode, testMode3 direction, boolean wrap) {
 
@@ -1214,11 +1198,75 @@ public abstract class Game {
         return false; //can't be reached
     }
 
+    public boolean sameCardOnOtherStack(FindWinningTrace.State.ReducedCard card, FindWinningTrace.State.ReducedStack otherStack, testMode2 mode) {
+        FindWinningTrace.State.ReducedStack origin = card.getStack();
+
+        if (card.getIndexOnStack() > 0 && origin.getCard(card.getIndexOnStack() - 1).isUp() && otherStack.getSize() > 0) {
+            FindWinningTrace.State.ReducedCard cardBelow = origin.getCard(card.getIndexOnStack() - 1);
+
+            if (mode == SAME_VALUE_AND_COLOR) {
+                if (cardBelow.getValue() == otherStack.getTopCard().getValue() && cardBelow.getColor() % 2 == otherStack.getTopCard().getColor() % 2) {
+                    return true;
+                }
+            } else if (mode == SAME_VALUE_AND_FAMILY) {
+                if (cardBelow.getValue() == otherStack.getTopCard().getValue() && cardBelow.getColor() == otherStack.getTopCard().getColor()) {
+                    return true;
+                }
+            } else if (mode == SAME_VALUE) {
+                if (cardBelow.getValue() == otherStack.getTopCard().getValue()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
     public int onMainStackTouch(FindWinningTrace.State state) {
         return 0;
     }
 
     public boolean autoCompleteStartTest(FindWinningTrace.State state){
         return false;
+    }
+
+
+
+    protected boolean testCardsUpToTop(FindWinningTrace.State.ReducedStack stack, int startPos, testMode mode) {
+
+        for (int i = startPos; i < stack.getSize() - 1; i++) {
+            FindWinningTrace.State.ReducedCard bottomCard = stack.getCard(i);
+            FindWinningTrace.State.ReducedCard upperCard = stack.getCard(i + 1);
+
+            if (!bottomCard.isUp() || !upperCard.isUp()) {
+                return false;
+            }
+
+            switch (mode) {
+                case ALTERNATING_COLOR:     //eg. black on red
+                    if ((bottomCard.getColor() % 2 == upperCard.getColor() % 2) || (bottomCard.getValue() != upperCard.getValue() + 1)) {
+                        return false;
+                    }
+                    break;
+                case SAME_COLOR:            //eg. black on black
+                    if ((bottomCard.getColor() % 2 != upperCard.getColor() % 2) || (bottomCard.getValue() != upperCard.getValue() + 1)) {
+                        return false;
+                    }
+                    break;
+                case SAME_FAMILY:           //eg spades on spades
+                    if ((bottomCard.getColor() != upperCard.getColor()) || (bottomCard.getValue() != upperCard.getValue() + 1)) {
+                        return false;
+                    }
+                    break;
+                case DOESNT_MATTER:
+                    if (bottomCard.getValue() != upperCard.getValue() + 1) {
+                        return false;
+                    }
+                    break;
+            }
+
+        }
+
+        return true;
     }
 }

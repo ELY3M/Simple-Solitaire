@@ -26,9 +26,12 @@ import java.util.ArrayList;
 import de.tobiasbielefeld.solitaire.classes.Card;
 import de.tobiasbielefeld.solitaire.classes.CardAndStack;
 import de.tobiasbielefeld.solitaire.classes.Stack;
+import de.tobiasbielefeld.solitaire.helper.FindWinningTrace;
 
 import static de.tobiasbielefeld.solitaire.SharedData.*;
 import static de.tobiasbielefeld.solitaire.games.Game.testMode.*;
+import static de.tobiasbielefeld.solitaire.games.Game.testMode3.ASCENDING;
+import static de.tobiasbielefeld.solitaire.games.Game.testMode3.DESCENDING;
 
 /**
  * Simple Simon Game! It's nearly like Spider, but with less cards and all cards are
@@ -139,4 +142,33 @@ public class SimpleSimon extends Spider {
 
         return null;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public boolean autoCompleteStartTest(FindWinningTrace.State state) {
+
+        for (int i = 0; i < 10; i++) {
+            if (state.stacks[i].getSize() > 0 && (state.stacks[i].getFirstUpCardPos() != 0 || !testCardsUpToTop(state.stacks[i], 0, SAME_FAMILY))) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+
+
+
 }

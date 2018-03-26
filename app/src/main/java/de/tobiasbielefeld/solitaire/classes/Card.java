@@ -37,15 +37,12 @@ public class Card {
     public static Bitmap background;
     private static Bitmap[] drawables = new Bitmap[52];
     public CustomImageView view;                                                                    //the image view of the card, for easier code not private
-    protected int color;                                                                              //1=clubs 2=hearts 3=Spades 4=diamonds
-    protected int value;                                                                              //1=ace 2,3,4,5,6,7,8,9,10, 11=joker 12=queen 13=king
-    protected Stack stack;                                                                            //saves the stack where the card is placed
-    protected int id;                                                                                 //internal id
-    protected boolean isUp;                                                                           //indicates if the card is placed upwards or backwards
-    protected PointF oldLocation = new PointF();                                                      //old location so cards can be moved back if they can't placed on a new stack
-
-    public Card(){
-    }
+    private int color;                                                                              //1=clubs 2=hearts 3=Spades 4=diamonds
+    private int value;                                                                              //1=ace 2,3,4,5,6,7,8,9,10, 11=joker 12=queen 13=king
+    private Stack stack;                                                                            //saves the stack where the card is placed
+    private int id;                                                                                 //internal id
+    private boolean isUp;                                                                           //indicates if the card is placed upwards or backwards
+    private PointF oldLocation = new PointF();                                                      //old location so cards can be moved back if they can't placed on a new stack
 
     /**
      * Sets id, color and value. The cards are initialized at game start with a for loop.

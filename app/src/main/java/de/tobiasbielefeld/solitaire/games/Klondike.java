@@ -653,17 +653,8 @@ public class Klondike extends Game {
 
     }
 
-    public boolean winTest(FindWinningTrace.State state) {
-        FindWinningTrace.State.ReducedStack[] stacks = state.stacks;
-        //if the foundation stacks aren't full, not won. Else won
-        for (int i = 7; i <= 10; i++) {
-            if (stacks[i].getSize() != 13) {
-                return false;
-            }
-        }
 
-        return true;
-    }
+
 
 
 
@@ -696,7 +687,7 @@ public class Klondike extends Game {
         //if there are cards on the main stack
         if (state.stacks[getMainStack().getId()].getSize() > 0) {
 
-            findWinningTrace.moveToStack(state, state.stacks[getMainStack().getId()].getTopCard(), state.stacks[13]);
+            findWinningTrace.moveToStack(state, state.stacks[getMainStack().getId()].getTopCard().getId(), 13);
 
 
             return 1;
@@ -710,12 +701,12 @@ public class Klondike extends Game {
                 cards.add(state.stacks[13].getCard(i));
             }
 
-            ArrayList<FindWinningTrace.State.ReducedCard> cardsReversed = new ArrayList<>();
+            ArrayList<Integer> cardsReversed = new ArrayList<>();
             for (int i = 0; i < cards.size(); i++) {
-                cardsReversed.add(cards.get(cards.size() - 1 - i));
+                cardsReversed.add(cards.get(cards.size() - 1 - i).getId());
             }
 
-            findWinningTrace.moveToStack(state, cardsReversed, state.stacks[getMainStack().getId()]);
+            findWinningTrace.moveToStack(state, cardsReversed, 14);
 
             return 2;
         }
@@ -737,10 +728,13 @@ public class Klondike extends Game {
         return true;
     }
 
-    public boolean addCardToMovementGameTest(FindWinningTrace.State.ReducedCard card, FindWinningTrace.State.ReducedStack[] stacks) {
-        //don't move cards from the discard stacks if there is a card on top of them
-        //for example: if touched a card on stack 11 (first discard stack) but there is a card
-        //on stack 12 (second discard stack) don't move if.
+    public boolean addCardToMovementGameTest(FindWinningTrace.State.ReducedCard card, FindWinningTrace.State.ReducedStack[] stacks){
+        if ( (card.getStackId() == 13 || card.getStackId() == 12 || card.getStackId() == 11)
+                               && card.getIndexOnStack()!=card.getStack().getSize()-1){
+                   return false;
+        }
+
+
         return !(((card.getStackId() == 11 || card.getStackId() == 12) && !stacks[13].isEmpty())
                 || (card.getStackId() == 11 && !stacks[12].isEmpty()));
     }

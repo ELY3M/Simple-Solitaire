@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import de.tobiasbielefeld.solitaire.classes.Card;
 import de.tobiasbielefeld.solitaire.classes.CardAndStack;
 import de.tobiasbielefeld.solitaire.classes.Stack;
+import de.tobiasbielefeld.solitaire.helper.FindWinningTrace;
 
 import static de.tobiasbielefeld.solitaire.SharedData.*;
 import static de.tobiasbielefeld.solitaire.games.Game.testMode.*;
@@ -382,5 +383,15 @@ public class Spider extends Game {
         }
 
         return null;
+    }
+
+
+    public boolean cardTest(FindWinningTrace.State.ReducedStack stack, FindWinningTrace.State.ReducedCard card) {
+        return stack.getId() < 10 && canCardBePlaced(stack, card, DOESNT_MATTER, DESCENDING, false);
+    }
+
+    public boolean addCardToMovementGameTest(FindWinningTrace.State.ReducedCard card, FindWinningTrace.State.ReducedStack[] stacks){
+        //do not accept cards from foundation and test if the cards are in the right order.
+        return card.getStackId() < 10 && testCardsUpToTop(card.getStack(), card.getIndexOnStack(), SAME_FAMILY);
     }
 }

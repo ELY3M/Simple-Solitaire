@@ -40,14 +40,11 @@ public class Stack {
             background11, background12, background13, arrowLeft, arrowRight, backgroundTransparent;
     public CustomImageView view;                                                                          //Background of the stack
     public ArrayList<Card> currentCards = new ArrayList<>();                                        //the array of cards on the stack
-    protected int id;                                                                                 //id: 0 to 6 tableau. 7 to 10 foundations. 11 and 12 discard and Main stack
+    private int id;                                                                                 //id: 0 to 6 tableau. 7 to 10 foundations. 11 and 12 discard and Main stack
     private float spacing;                                                                          //direction in which the cards on the stacks are ordered (top, down, left, right)
     private SpacingDirection spacingDirection = SpacingDirection.NONE;
     private ArrowDirection arrowDirection;
     private float spacingMax;
-
-    public Stack(){
-    }
 
     public Stack(int id) {                                                                          //Constructor: set id
         this.id = id;
@@ -106,7 +103,7 @@ public class Stack {
      * @param card The card to remove
      */
     public void removeCard(Card card) {
-        currentCards.remove(currentCards.indexOf(card));
+        currentCards.remove(card);
         updateSpacing();
 
     }

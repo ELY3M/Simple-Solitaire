@@ -24,7 +24,6 @@ public class FindWinningTrace {
 
     private static int TRACE_MAX_LENGTH = 20;
     private static int MAX_TIME_MILLIS = 5000;
-    private static int CARDS_MAX_SIZE;
 
     private volatile long maxTime;
     private volatile int runCounter = 1;
@@ -261,6 +260,7 @@ public class FindWinningTrace {
 
             if (findWinningTrace.currentId == id && findWinningTrace.isRunning){
                     findWinningTrace.isRunning = false;
+                    //logText("canceling");
             }
         }
     }
@@ -272,9 +272,9 @@ public class FindWinningTrace {
     public void decrementRunCounter(){
         runCounter --;
 
-        if (runCounter==0 && isRunning){
-           // gameLogic.setWinnableText("Cannot be won");
-           // isRunning = false;
+        if (runCounter<=0 && isRunning){
+            gameLogic.setWinnableText("Cannot be won");
+            isRunning = false;
         }
     }
 
@@ -291,9 +291,8 @@ public class FindWinningTrace {
     public void initiate(Stack[] normalStacks, Card[] normalCards){
 
         //gameLogic.setWinnableText("Calculating...",false);
-        //runCounter = 0;
+        runCounter = 0;
 
-        CARDS_MAX_SIZE = normalCards.length;
         isRunning = true;
         maxTime = System.currentTimeMillis() + MAX_TIME_MILLIS;
         currentId ++;
@@ -304,16 +303,51 @@ public class FindWinningTrace {
     }
 
     public void run(final State state) {
-        runCounter ++;
+
 
         AsyncTask.execute(new Runnable() {
             @Override
             public void run () {
-                runTest(state);
-                decrementRunCounter();
+                boolean alreadyFlipped = false;
 
-                if (runCounter==0){
-                    logState(state);
+                while (isRunning) {
+                    //runCounter++;
+                    //runTest(state);
+                    //decrementRunCounter();
+
+                    if (System.currentTimeMillis() > maxTime){
+                        return;
+                    }
+
+                    if (currentGame.autoCompleteStartTest(state)) {
+                        isRunning = false;
+                        returnWinningTrace(state);
+                        return;
+                    }
+
+
+                    if (currentGame.hasMainStack()) {
+
+                        if (moveCard(state)) {
+                            alreadyFlipped = false;
+                        }
+
+                        int result = currentGame.onMainStackTouch(state);
+
+                        if (result == 2 ) {
+                            if (alreadyFlipped){
+                                gameLogic.setWinnableText("Cannot be won");
+                                return;
+                            } else{
+                                alreadyFlipped = true;
+                            }
+                        }
+
+
+
+                    } else {
+                        moveCard(state);
+                    }
                 }
             }
         });
@@ -345,7 +379,7 @@ public class FindWinningTrace {
 
         //logText("size: " + state.trace.size());
         //logText("" + runCounter);
-       // logState(state);
+        logState(state);
 
         /*if (state.counter == 0){
             logState(state);
@@ -379,7 +413,6 @@ public class FindWinningTrace {
     }
 
     private boolean moveCard(State state){
-        boolean foundCardToMove = false;
 
         for (int i=0;i<state.stacks.length;i++){
 
@@ -407,15 +440,12 @@ public class FindWinningTrace {
                                 continue;
                             }
                             //avoid moving cards between stacks, eg moving a nine lying on a ten moving to another then, moving it back and so on...
-                            //else if (currentGame.tableauStacksContain(i) && currentGame.sameCardOnOtherStack(cardToMove,state.stacks[k], Game.testMode2.SAME_VALUE_AND_COLOR)) {
-                           //     continue;
-                            //}
-                            else if (alreadyMoved(state,cardToMove.getId(),k)){
+                            else if (currentGame.tableauStacksContain(i) && currentGame.sameCardOnOtherStack(cardToMove,state.stacks[k], Game.testMode2.SAME_VALUE_AND_COLOR)) {
                                 continue;
-                            }//*/
-
-                            foundCardToMove = true;
-
+                            }
+                            //else if (alreadyMoved(state,cardToMove.getId(),k)){
+                            //    continue;
+                            //}//*/
 
                             int size = state.stacks[i].getSize() - j;
 
@@ -426,15 +456,16 @@ public class FindWinningTrace {
                             }
 
                             moveToStack(state, k, cardsToMove);
+
+                            return true;
                         }
                     }
                 }
             }
         }
 
-        return foundCardToMove;
+        return false;
     }
-
 
     private boolean alreadyMoved(State state, int cardId, int destinationId){
 
@@ -454,18 +485,14 @@ public class FindWinningTrace {
         return false;
     }
 
-    private State.ReducedStack getMainStack(State state){
-        return state.stacks[currentGame.getMainStackId()];
-    }
-
     public void moveToStack(State state,  int destinationId, int... cardIds) {
 
-        final State newState = state.deepCopy();
+        //final State newState = state.deepCopy();
 
-        newState.addTrace(cardIds[0], destinationId, state.cards[cardIds[0]].getStackId());
+        //state.addTrace(cardIds[0], destinationId, state.cards[cardIds[0]].getStackId());
 
-        State.ReducedCard firstCard = newState.cards[cardIds[0]];
-        State.ReducedStack destination = newState.stacks[destinationId];
+        State.ReducedCard firstCard = state.cards[cardIds[0]];
+        State.ReducedStack destination = state.stacks[destinationId];
 
         int indexOfFirstCard = firstCard.getIndexOnStack();
 
@@ -477,12 +504,12 @@ public class FindWinningTrace {
 
 
         for (int i : cardIds){
-            newState.cards[i].removeFromCurrentStack();
-            destination.addCard( newState.cards[i]);
+            state.cards[i].removeFromCurrentStack();
+            destination.addCard( state.cards[i]);
         }
 
 
-        run(newState);
+        //run(newState);
     }
 
     public void moveToStackInSameState(State state,  int destinationId, int... cardIds) {

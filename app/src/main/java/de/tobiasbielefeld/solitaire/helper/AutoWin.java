@@ -54,8 +54,6 @@ public class AutoWin {
     private boolean testAfterMove = false;
     private boolean emptyMainStack = false;
 
-    private List<FindWinningTrace.State.Entry> trace;
-
     public void reset() {
         isRunning = false;
     }

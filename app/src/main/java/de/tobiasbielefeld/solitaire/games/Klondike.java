@@ -687,7 +687,7 @@ public class Klondike extends Game {
         //if there are cards on the main stack
         if (state.stacks[getMainStack().getId()].getSize() > 0) {
 
-            findWinningTrace.moveToStackInSameState(state, state.stacks[getMainStack().getId()].getTopCard().getId(), 13);
+            findWinningTrace.moveToStack(state, 13, state.stacks[getMainStack().getId()].getTopCard().getId() );
 
 
             return 1;
@@ -695,14 +695,15 @@ public class Klondike extends Game {
         //if there are NO cards on the main stack, but cards on the discard stacks, move them all to main
         else if (state.stacks[13].getSize() != 0) {
 
-            int[] cardIds = new int[stacks[13].getSize()];
-            int size = state.stacks[13].getSize()-1;
+            int size = state.stacks[13].getSize();
+            int[] cardIds = new int[size];
 
-            for (int i = 0; i <= size; i++) {
-                cardIds[size-i] = state.stacks[13].getCard(i).getId();
+
+            for (int i = 0; i < size; i++) {
+                cardIds[size-1-i] = state.stacks[13].getCard(i).getId();
             }
 
-            findWinningTrace.moveToStackInSameState(state,14, cardIds);
+            findWinningTrace.moveToStack(state,14, cardIds);
 
             return 2;
         }

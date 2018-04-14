@@ -16,6 +16,8 @@ import static de.tobiasbielefeld.solitaire.SharedData.currentGame;
 import static de.tobiasbielefeld.solitaire.SharedData.findWinningTrace;
 import static de.tobiasbielefeld.solitaire.SharedData.gameLogic;
 import static de.tobiasbielefeld.solitaire.SharedData.logText;
+import static de.tobiasbielefeld.solitaire.SharedData.stacks;
+
 /**
  * Created by tobias on 20.03.18.
  */
@@ -426,7 +428,8 @@ public class FindWinningTrace {
 
                 if (cardToMove.isUp() && currentGame.addCardToMovementGameTest(cardToMove,state.stacks)){
 
-                    for (int k=state.stacks.length-1;k>=0;k--){
+                    for (int k=01;k< stacks.length;k++){
+                    //for (int k=state.stacks.length-1;k>=0;k--){
                         State.ReducedStack destination = state.stacks[k];
 
                         if (i!=k && currentGame.cardTest(destination,cardToMove)){

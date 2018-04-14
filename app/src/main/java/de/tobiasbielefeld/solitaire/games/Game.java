@@ -34,6 +34,7 @@ import de.tobiasbielefeld.solitaire.R;
 import de.tobiasbielefeld.solitaire.classes.Card;
 import de.tobiasbielefeld.solitaire.classes.CardAndStack;
 import de.tobiasbielefeld.solitaire.classes.Stack;
+import de.tobiasbielefeld.solitaire.classes.State;
 import de.tobiasbielefeld.solitaire.helper.FindWinningTrace;
 import de.tobiasbielefeld.solitaire.helper.Sounds;
 import de.tobiasbielefeld.solitaire.ui.GameManager;
@@ -1150,17 +1151,17 @@ public abstract class Game {
     }
 
 
-    public boolean addCardToMovementGameTest(FindWinningTrace.State.ReducedCard card, FindWinningTrace.State.ReducedStack[] stacks){
+    public boolean addCardToMovementGameTest(State.ReducedCard card, State.ReducedStack[] stacks){
         return false;
     }
 
-    public boolean cardTest(FindWinningTrace.State.ReducedStack stack, FindWinningTrace.State.ReducedCard card) {
+    public boolean cardTest(State.ReducedStack stack, State.ReducedCard card) {
         return false;
     }
 
 
 
-    protected boolean canCardBePlaced(FindWinningTrace.State.ReducedStack stack, FindWinningTrace.State.ReducedCard card, testMode mode, testMode3 direction, boolean wrap) {
+    protected boolean canCardBePlaced(State.ReducedStack stack, State.ReducedCard card, testMode mode, testMode3 direction, boolean wrap) {
 
         if (stack.isEmpty()) {
             return true;
@@ -1198,11 +1199,11 @@ public abstract class Game {
         return false; //can't be reached
     }
 
-    public boolean sameCardOnOtherStack(FindWinningTrace.State.ReducedCard card, FindWinningTrace.State.ReducedStack otherStack, testMode2 mode) {
-        FindWinningTrace.State.ReducedStack origin = card.getStack();
+    public boolean sameCardOnOtherStack(State.ReducedCard card, State.ReducedStack otherStack, testMode2 mode) {
+        State.ReducedStack origin = card.getStack();
 
         if (card.getIndexOnStack() > 0 && origin.getCard(card.getIndexOnStack() - 1).isUp() && otherStack.getSize() > 0) {
-            FindWinningTrace.State.ReducedCard cardBelow = origin.getCard(card.getIndexOnStack() - 1);
+            State.ReducedCard cardBelow = origin.getCard(card.getIndexOnStack() - 1);
 
             if (mode == SAME_VALUE_AND_COLOR) {
                 if (cardBelow.getValue() == otherStack.getTopCard().getValue() && cardBelow.getColor() % 2 == otherStack.getTopCard().getColor() % 2) {
@@ -1222,21 +1223,21 @@ public abstract class Game {
         return false;
     }
 
-    public int onMainStackTouch(FindWinningTrace.State state) {
+    public int onMainStackTouch(State state) {
         return 0;
     }
 
-    public boolean autoCompleteStartTest(FindWinningTrace.State state){
+    public boolean autoCompleteStartTest(State state){
         return false;
     }
 
 
 
-    protected boolean testCardsUpToTop(FindWinningTrace.State.ReducedStack stack, int startPos, testMode mode) {
+    protected boolean testCardsUpToTop(State.ReducedStack stack, int startPos, testMode mode) {
 
         for (int i = startPos; i < stack.getSize() - 1; i++) {
-            FindWinningTrace.State.ReducedCard bottomCard = stack.getCard(i);
-            FindWinningTrace.State.ReducedCard upperCard = stack.getCard(i + 1);
+            State.ReducedCard bottomCard = stack.getCard(i);
+            State.ReducedCard upperCard = stack.getCard(i + 1);
 
             if (!bottomCard.isUp() || !upperCard.isUp()) {
                 return false;

@@ -42,6 +42,7 @@ import de.tobiasbielefeld.solitaire.helper.Animate;
 import de.tobiasbielefeld.solitaire.helper.AutoComplete;
 import de.tobiasbielefeld.solitaire.helper.Bitmaps;
 import de.tobiasbielefeld.solitaire.helper.CardHighlight;
+import de.tobiasbielefeld.solitaire.helper.EnsureMovability;
 import de.tobiasbielefeld.solitaire.helper.FindWinningTrace;
 import de.tobiasbielefeld.solitaire.helper.GameLogic;
 import de.tobiasbielefeld.solitaire.helper.Hint;
@@ -76,6 +77,7 @@ public class SharedData {
 
     public static AutoComplete autoComplete;
     public static FindWinningTrace findWinningTrace = new FindWinningTrace();
+    public static EnsureMovability ensureMovability = new EnsureMovability();
     public static Timer timer;
     public static Sounds sounds;
     public static RecordList recordList;

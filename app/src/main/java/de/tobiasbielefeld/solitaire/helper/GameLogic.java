@@ -24,11 +24,17 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import de.tobiasbielefeld.solitaire.R;
+import de.tobiasbielefeld.solitaire.SharedData;
 import de.tobiasbielefeld.solitaire.classes.Card;
 import de.tobiasbielefeld.solitaire.classes.Stack;
+import de.tobiasbielefeld.solitaire.dialogs.DialogEnsureMovability;
 import de.tobiasbielefeld.solitaire.ui.GameManager;
 
 import static de.tobiasbielefeld.solitaire.SharedData.*;
+
+import static de.tobiasbielefeld.solitaire.classes.Card.movements.INSTANT;
+import static de.tobiasbielefeld.solitaire.classes.Card.movements.DEFAULT;
+import static de.tobiasbielefeld.solitaire.classes.Card.movements.NONE;
 
 /**
  * Contains stuff for the game which I didn't know where I should put it.
@@ -40,6 +46,7 @@ public class GameLogic {
     private boolean won, wonAndReloaded;                                                            //shows if the player has won, needed to know if the timer can stop, or to deal new cards on game start
     private GameManager gm;
     private boolean movedFirstCard = false;
+    private DialogEnsureMovability dialogEnsureMovability;
 
     public GameLogic(GameManager gm) {
         this.gm = gm;
@@ -103,24 +110,19 @@ public class GameLogic {
         autoComplete.reset();
         sounds.playSound(Sounds.names.DEAL_CARDS);
 
+        for (Card card : cards) {
+            card.setLocationWithoutMovement(currentGame.getDealStack().getX(), currentGame.getDealStack().getY());
+            card.flipDown();
+        }
+
         try {
             if (firstRun) {
                 newGame();
                 prefs.saveFirstRun(false);
-            }  else if (wonAndReloaded && prefs.getSavedAutoStartNewGame()){        //in case the game was selected from the main menu and it was already won, start a new game
+            }  else if (wonAndReloaded && prefs.getSavedAutoStartNewGame()){
+                //in case the game was selected from the main menu and it was already won, start a new game
                 newGame();
-            } else if (won) {                   //in case the screen orientation changes, do not immediately start a new game
-                loadRandomCards();
-
-                for (Card card : cards) {
-                    card.setLocationWithoutMovement(gm.layoutGame.getWidth(), 0);
-                }
             } else {
-                for (Card card : cards) {
-                    card.setLocationWithoutMovement(currentGame.getDealStack().getX(), currentGame.getDealStack().getY());
-                    card.flipDown();
-                }
-
                 scores.load();
                 recordList.load();
                 timer.setCurrentTime(prefs.getSavedEndTime());
@@ -142,9 +144,9 @@ public class GameLogic {
                 currentGame.loadRecycleCount(gm);
 
                 //deal the cards again in case the app got killed while trying  before
-                if (prefs.isDealingCards()){
+                /* (prefs.isDealingCards()){
                     handlerDealCards.sendEmptyMessage(0);
-                }
+                }*/
             }
         } catch (Exception e) {
             Log.e(gm.getString(R.string.loading_data_failed), e.toString());
@@ -154,9 +156,17 @@ public class GameLogic {
     }
 
     public void checkForAutoCompleteButton(){
-        if (!autoComplete.buttonIsShown() && currentGame.autoCompleteStartTest()) {
+        if (!prefs.getHideAutoCompleteButton() && !autoComplete.buttonIsShown() && currentGame.autoCompleteStartTest() && !hasWon()) {
             autoComplete.showButton();
         }
+    }
+
+    public void newGameForEnsureMovability(){
+        System.arraycopy(cards, 0, randomCards, 0, cards.length);
+        randomize(randomCards);
+        redeal();
+
+        dialogEnsureMovability.startTest();
     }
 
     /**
@@ -164,10 +174,19 @@ public class GameLogic {
      */
     public void newGame() {
         System.arraycopy(cards, 0, randomCards, 0, cards.length);
-
         randomize(randomCards);
 
-        redeal();
+        if (prefs.getSavedEnsureMovability()) {
+            stopMovements = true;
+            dialogEnsureMovability = new DialogEnsureMovability();
+            dialogEnsureMovability.show(gm.getSupportFragmentManager(), "DIALOG_ENSURE_MOVABILITY");
+
+            redeal();
+
+            dialogEnsureMovability.startTest();
+        } else {
+            redeal();
+        }
     }
 
     /**
@@ -193,7 +212,7 @@ public class GameLogic {
             stack.reset();
         }
 
-        //Put cards to the specified "deal from" stack. (=main stack if the game has one, else specify it in the game
+        //Put cards to the specified "deal from" stack. (=main stack if the game has one, else specify it in the game)
         for (Card card : randomCards) {
             if (won) {
                 card.setLocationWithoutMovement(currentGame.getDealStack().getX(), currentGame.getDealStack().getY());
@@ -201,7 +220,7 @@ public class GameLogic {
                 card.setLocation(currentGame.getDealStack().getX(), currentGame.getDealStack().getY());
             }
 
-            currentGame.getDealStack().addCard(card,false);
+            currentGame.getDealStack().addCard(card);
             card.flipDown();
         }
 
@@ -217,8 +236,13 @@ public class GameLogic {
         //save that the game is dealing cards, in case the application gets killed before calling the handler
         prefs.setDealingCards(true);
 
-        //and finally deal the cards from the game!
-        handlerDealCards.sendEmptyMessage(0);
+        if (stopMovements) {
+            //no need to wait in the handler when stopMovements is true
+            currentGame.dealNewGame();
+        } else {
+            //and finally deal the cards from the game!
+            handlerDealCards.sendEmptyMessage(0);
+        }
     }
 
     /**
@@ -245,7 +269,7 @@ public class GameLogic {
      *
      * @param array The array to randomize
      */
-    private void randomize(Card[] array) {
+    public void randomize(Card[] array) {
         int index;
         Card dummy;
         Random random = getPrng();
